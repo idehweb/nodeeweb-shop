@@ -1,7 +1,9 @@
 # [Nodeeweb Shop | How to create online shop with nodejs reactjs mongodb](https://idehweb.com/product/creare-website-or-application-with-nodeeweb/)
 
-Nodeeweb is a free and open source WebApplication Builder , a [CMS] which helps building and handling pages, products, posts and other models.
+The plugin add shop functionality to your nodeeweb core.
+
 You can create and online shop, website or application, handle products, orders, transactions with this plugin.
+
 Here we are creating an example of usage
 
 
@@ -173,7 +175,7 @@ Nodeeweb is licensed under the GNU GENERAL PUBLIC LICENSE, sponsored and support
 
 ## Changelogs
 
-== 0.0.4 
+== 0.0.5
     update readme file and docs
 == 0.0.1 
     stable
