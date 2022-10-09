@@ -175,6 +175,8 @@ Nodeeweb is licensed under the GNU GENERAL PUBLIC LICENSE, sponsored and support
 
 ## Changelogs
 
+== 0.0.6
+    change routes
 == 0.0.5
     update readme file and docs
 == 0.0.1 
