@@ -175,9 +175,23 @@ Nodeeweb is licensed under the GNU GENERAL PUBLIC LICENSE, sponsored and support
 
 ## Changelogs
 
+== 0.0.10
+    add transaction
+
+== 0.0.9
+    add rewriteProductsImages to products , req.query.url
+
+== 0.0.8
+    add special create function to order
+    
+== 0.0.7
+    change product routes access
+    
 == 0.0.6
     change routes
+    
 == 0.0.5
     update readme file and docs
+    
 == 0.0.1 
     stable

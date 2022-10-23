@@ -18,24 +18,33 @@ export default [
     {
         "path": "/:id",
         "method": "get",
-        "access": "admin_user,admin_shopManager",
+        "access": "customer_all",
+        // "controller":()=>{
+        //     console.log('hi')
+        // }
     },
     {
         "path": "/",
         "method": "post",
         "access": "admin_user,admin_shopManager",
     },
-    {
-        "path": "/importFromWordpress",
-        "method": "post",
-        "access": "admin_user,admin_shopManager",
-        "controller": controller.importFromWordpress,
-    },
+    // {
+    //     "path": "/importFromWordpress",
+    //     "method": "post",
+    //     "access": "admin_user,admin_shopManager",
+    //     "controller": controller.importFromWordpress,
+    // },
     {
         "path": "/rewriteProducts",
         "method": "post",
         "access": "admin_user,admin_shopManager",
         "controller": controller.rewriteProducts,
+    },
+    {
+        "path": "/rewriteProductsImages",
+        "method": "post",
+        "access": "admin_user,admin_shopManager",
+        "controller": controller.rewriteProductsImages,
     },
     {
         "path": "/:id",

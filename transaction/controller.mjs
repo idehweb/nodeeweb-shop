@@ -1,15 +1,17 @@
-import Transaction from "#models/transaction";
-import Order from "#models/order";
-import Customer from "#models/customer";
-import Link from "#models/link";
-//const rp from "request-promise";
-import request from "#root/request";
-
-import global from "#root/global";
-import CONFIG from "#c/config";
+// import Transaction from "#models/transaction";
+// import Order from "#models/order";
+// import Customer from "#models/customer";
+// import Link from "#models/link";
+// //const rp from "request-promise";
+// import request from "#root/request";
+//
+// import global from "#root/global";
+// import CONFIG from "#c/config";
 
 var self = ({
     buy: function (req, res, next) {
+        let Order = req.mongoose.model('Order');
+
         console.log("buying...");
         Order.findById(req.params._id, "sum , orderNumber , amount",
             function (err, order) {
@@ -65,15 +67,19 @@ var self = ({
 
     },
     buyZibal: function (req, res, next) {
-        console.log("buying...", req.params._id, req.params._price);
+        let Order = req.mongoose.model('Order');
+        let Product = req.mongoose.model('Product');
+        let Transaction = req.mongoose.model('Transaction');
+
+        console.log("buyZibal...", req.params._id, req.params._price);
         if (req.params._price && (req.params._price == null || req.params._price == "null"))
             return res.json({
                 success: false,
                 message: "req.params._price"
             });
-        global.getSetting("ZIBAL_TOKEN").then((merchant) => {
+        req.global.getSetting("ZIBAL_TOKEN").then((merchant) => {
             console.log('merchant', merchant)
-            Order.findById(req.params._id, "sum , orderNumber , amount , discount",
+            Order.findById(req.params._id, "sum , orderNumber , amount , discount , customer",
                 function (err, order) {
                     if (err || !order) {
                         res.json({
@@ -108,40 +114,47 @@ var self = ({
                         body: {
                             merchant: merchant,
                             amount: amount,
-                            callbackUrl: global.domain + "/" + "transaction",
+                            callbackUrl: req.global.domain + "/" + "transaction",
                             description: "سفارش #" + order.orderNumber,
                             orderId: order.orderNumber
                         },
                         json: true // Automatically stringifies the body to JSON
                     };
-                    console.log('options');
+                    // console.log('options',options);
                     let $text;
-                    $text = "customer is paying " + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " Rial" + "\n" + "order number: # " + order.orderNumber + "\n" + CONFIG.ADMIN_URL + "/#/order/" + order._id + "\n";
+                    $text = "customer is paying " + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " Rial" + "\n" + "order number: # " + order.orderNumber + "\n" + process.env.ADMIN_URL + "/#/order/" + order._id + "\n";
                     $text += "customer phone number: " + order.customer.phoneNumber;
 
-                    // global.sendSms('9120539945', $text,'300088103373');
+                    // req.global.sendSms('9120539945', $text,'300088103373');
                     let ttt = "";
                     if (order.customer && (order.customer.firstName && order.customer.lastName)) {
                         ttt = order.customer.firstName + " " + order.customer.lastName;
                     }
 
-                    // global.sendSms('9147338721', $text,'300088103373');
-                    // global.sendSms('9124205049', $text,'300088103373');
-                    // global.sendSms('9024252801', $text,'300088103373');
+                    // req.global.sendSms('9147338721', $text,'300088103373');
+                    // req.global.sendSms('9124205049', $text,'300088103373');
+                    // req.global.sendSms('9024252801', $text,'300088103373');
                     let objd = {};
                     let $tz = $text + "\n";
                     // $tz += $text;
                     objd.message = $tz;
 // let im='';
 //                 console.log('objd', objd);
-                    global.publishToTelegram(objd);
+                    req.global.publishToTelegram(objd);
                     //
                     // rp(options)
                     //     .then(function (parsedBody) {
-                    request(options, function (error, response, parsedBody) {
-
+                    console.log('options', options)
+                    req.httpRequest(options).then(function (parsedBody) {
+                        parsedBody = parsedBody['data']
                         console.log("parsedBody", parsedBody);
-
+                        if (parsedBody['result'] == 102) {
+                            return res.json({
+                                success: false,
+                                merchant: merchant,
+                                message: parsedBody['message']
+                            })
+                        }
                         let obj = {
                             // 'customer': req.headers.customer._id,
                             "amount": amount,
@@ -157,11 +170,12 @@ var self = ({
                                     transaction: transaction._id
                                 }
                             }, function (order_err, updated_order) {
-                                console.log("updated_order", updated_order);
-                                console.log("order_err", order_err);
+                                // console.log("updated_order", updated_order);
+                                // console.log("order_err", order_err);
                                 if (parsedBody.result == 100) {
+                                    console.log('parsedBody.result', parsedBody.result)
                                     // let $text_c = ttt + " عزیز" + "\n" + "سفارش شما دریافت شد و در انتظار پرداخت است، شماره سفارش:" + order.orderNumber + "\n" + "لینک پرداخت:" + "\n" + "https://gateway.zibal.ir/start/" + parsedBody.trackId + "\n" + "آروند، یک گارانتی دوست داشتنی!";
-                                    global.sendSms(order.customer.phoneNumber, [{
+                                    req.global.sendSms(order.customer.phoneNumber, [{
                                         key: "customer",
                                         value: ttt
                                     }, {key: "orderNumber", value: order.orderNumber}, {
@@ -186,6 +200,9 @@ var self = ({
         }).catch(e => res.json(e))
     },
     update: function (req, res, next) {
+        let Order = req.mongoose.model('Order');
+        let Product = req.mongoose.model('Product');
+        let Transaction = req.mongoose.model('Transaction');
         // console.log('update buying...');
         Transaction.findByIdAndUpdate(req.params._id,
             {
@@ -209,6 +226,9 @@ var self = ({
 
     },
     status: function (req, res, next) {
+        let Order = req.mongoose.model('Order');
+        let Product = req.mongoose.model('Product');
+        let Transaction = req.mongoose.model('Transaction');
         return new Promise(function (resolve) {
 
             Transaction.findOne({Authority: req.query.Authority}, function (
@@ -363,6 +383,9 @@ var self = ({
         });
     },
     statusD: function (req, res, next) {
+        let Order = req.mongoose.model('Order');
+        let Product = req.mongoose.model('Product');
+        let Transaction = req.mongoose.model('Transaction');
         // return new Promise(function (resolve) {
         // console.log("\n\n\n\n\n Srtatus DDDD");
         if (!req.body.Authority) {
@@ -597,6 +620,9 @@ var self = ({
         // });
     },
     statusZibal: function (req, res, next) {
+        let Order = req.mongoose.model('Order');
+        let Product = req.mongoose.model('Product');
+        let Transaction = req.mongoose.model('Transaction');
         // return new Promise(function (resolve) {
         // console.log("\n\n\n\n\n Srtatus DDDD");
         if (!req.body.Authority) {
@@ -609,7 +635,7 @@ var self = ({
             return 0;
 
         }
-        global.getSetting("ZIBAL_TOKEN").then((merchant) => {
+        req.global.getSetting("ZIBAL_TOKEN").then((merchant) => {
 
             Transaction.findOne({Authority: req.body.Authority}, function (
                 err,
@@ -693,16 +719,16 @@ var self = ({
                                             console.log('order', order);
                                             let $text = "";
                                             if (order) {
-                                                $text = "customer payed: " + order.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " Toman" + "\n" + "order number: # " + order.orderNumber + "\n" + CONFIG.ADMIN_URL + "/#/order/" + order._id + "\n";
+                                                $text = "customer payed: " + order.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " Toman" + "\n" + "order number: # " + order.orderNumber + "\n" + process.env.ADMIN_URL + "/#/order/" + order._id + "\n";
                                                 $text += "customer phone number: " + order.customer.phoneNumber;
                                             }
-                                            // global.sendSms('9120539945', $text,'300088103373');
+                                            // req.global.sendSms('9120539945', $text,'300088103373');
                                             let ttt = "";
                                             if (order && order.customer && (order.customer.firstName && order.customer.lastName)) {
                                                 ttt = order.customer.firstName + " " + order.customer.lastName;
                                             }
 
-                                            // global.sendSms("9024252801", $text, "300088103373");
+                                            // req.global.sendSms("9024252801", $text, "300088103373");
                                             let objd = {};
                                             let $tz = $text + "\n";
                                             objd.message = $tz;
@@ -710,7 +736,7 @@ var self = ({
 
                                             //let $text_c = ttt + " عزیز" + "\n" + "سفارش شما با موفقیت ثبت شد و در دست بررسی است، شماره سفارش:" + order.orderNumber + "\n" + "لینک سفارشات:" + "\n" + "http://localhost:3001/my-account/" + "\n" + "آروند، یک گارانتی دوست داشتنی!";
                                             if (order)
-                                                global.sendSms(order.customer.phoneNumber, [
+                                                req.global.sendSms(order.customer.phoneNumber, [
                                                     {
                                                         key: "customer",
                                                         value: ttt
@@ -721,10 +747,10 @@ var self = ({
                                                     },
                                                     {
                                                         key: "myOrdersLink",
-                                                        value: CONFIG.SHOP_URL + "/my-account/"
+                                                        value: process.env.SHOP_URL + "/my-account/"
                                                     }], "300088103373", null, "98", "sms_submitOrderSuccessPaying");
 
-                                            global.publishToTelegram(objd);
+                                            req.global.publishToTelegram(objd);
 
                                             // console.log('order.deliveryDay', order.deliveryDay);
                                             if (order.deliveryDay && order.deliveryDay.theid == "chapar") {
@@ -831,6 +857,10 @@ var self = ({
     },
 
     verify: function (req, res, next) {
+        let Order = req.mongoose.model('Order');
+        let Product = req.mongoose.model('Product');
+        let Transaction = req.mongoose.model('Transaction');
+        let Customer = req.mongoose.model('Customer');
         Transaction.findOne({Authority: req.params.bank_token}, function (
             err,
             transaction

@@ -1,4 +1,8 @@
 import _ from 'lodash'
+import path from 'path'
+import mime from 'mime'
+import fs from 'fs'
+import https from 'https'
 
 let self = ({
     importFromWordpress: function (req, res, next) {
@@ -60,6 +64,25 @@ let self = ({
         let Media = req.mongoose.model('Media');
         Product.find({}, function (err, products) {
             _.forEach(products, (item) => {
+                let obj={};
+
+                if (item.data.regular_price){
+                    obj['price']=item.data.regular_price;
+                }
+                if (item.data.regular_price){
+                    obj['salePrice']=item.data.sale_price;
+                }
+                Product.findByIdAndUpdate(item._id, obj, function (err, products) {
+                })
+
+            })
+        })
+    },
+    rewriteProductsImages: function (req, res, next) {
+        let Product = req.mongoose.model('Product');
+        let Media = req.mongoose.model('Media');
+        Product.find({}, function (err, products) {
+            _.forEach(products, (item) => {
                 // console.log('item', item.data.short_description)
                 // console.log('item', item.data.sku)
                 // console.log('item', item.data.regular_price)
@@ -67,63 +90,65 @@ let self = ({
                 // console.log('item', item.data.total_sales)
                 // console.log('item', item.data.images)
                 let photos = [];
-                // if (item.data.images) {
-                //     _.forEach((item.data.images ? item.data.images : []), async (c, cx) => {
-                //         let mainUrl = encodeURI(c.src);
-                //         console.log('images[', cx, ']', mainUrl);
-                //
-                //         let filename =
-                //                 c.src.split('/').pop(),
-                //             __dirname = path.resolve(),
-                //             name = (req.global.getFormattedTime() + filename).replace(/\s/g, ''),
-                //             type = path.extname(name),
-                //             mimtype = mime.getType(type),
-                //             filePath = path.join(__dirname, "./public_media/customer/", name),
-                //             fstream = fs.createWriteStream(filePath);
-                //
-                //         https.get(mainUrl, function (response) {
-                //             console.log('getting mainUrl', mainUrl);
-                //             response.pipe(fstream);
-                //         });
-                //
-                //         // console.log('cx', cx);
-                //
-                //         fstream.on("close", function () {
-                //             // console.log('images[' + cx + '] saved');
-                //             let url = "customer/" + name,
-                //                 obj = [{name: name, url: url, type: mimtype}];
-                //             Media.create({
-                //                 name: obj[0].name,
-                //                 url: obj[0].url,
-                //                 type: obj[0].type
-                //
-                //             }, function (err, media) {
-                //                 if (err) {
-                //                     // console.log({
-                //                     //     err: err,
-                //                     //     success: false,
-                //                     //     message: 'error'
-                //                     // })
-                //                 } else {
-                //                     // console.log(cx, ' imported');
-                //
-                //                     photos.push(media.url);
-                //                     if (photos.length == item.data.images.length) {
-                //                         Product.findByIdAndUpdate(item._id, {photos: photos}, function (err, products) {
-                //                         })
-                //                     }
-                //                 }
-                //             });
-                //
-                //         });
-                //
-                //
-                //     });
-                // } else {
-                // }
-                if (item.photos)
-                    Product.findByIdAndUpdate(item._id, {thumbnail: item.photos[0]}, function (err, products) {
-                    })
+                if (item.photos) {
+                    _.forEach((item.photos ? item.photos : []), async (c, cx) => {
+                        let mainUrl = encodeURI(c);
+                        console.log('images[', cx, ']', mainUrl);
+
+                        let filename =
+                                c.split('/').pop(),
+                            __dirname = path.resolve(),
+                            // name = (req.global.getFormattedTime() + filename).replace(/\s/g, ''),
+                            name = filename,
+                            type = path.extname(name),
+                            mimtype = mime.getType(type),
+                            filePath = path.join(__dirname, "./public_media/customer/", name),
+                            fstream = fs.createWriteStream(filePath);
+                        console.log('name',filename)
+                        console.log('getting mainUrl', req.query.url+mainUrl);
+
+                        https.get(req.query.url+mainUrl, function (response) {
+                            response.pipe(fstream);
+                        });
+
+                        // console.log('cx', cx);
+
+                        fstream.on("close", function () {
+                            // console.log('images[' + cx + '] saved');
+                            let url = "customer/" + name,
+                                obj = [{name: name, url: url, type: mimtype}];
+                            // Media.create({
+                            //     name: obj[0].name,
+                            //     url: obj[0].url,
+                            //     type: obj[0].type
+                            //
+                            // }, function (err, media) {
+                            //     if (err) {
+                            //         // console.log({
+                            //         //     err: err,
+                            //         //     success: false,
+                            //         //     message: 'error'
+                            //         // })
+                            //     } else {
+                            // console.log(cx, ' imported');
+
+                            // photos.push(media.url);
+                            // if (photos.length == item.photos.length) {
+                            //     Product.findByIdAndUpdate(item._id, {photos: photos}, function (err, products) {
+                            //     })
+                            // }
+                            //     }
+                            // });
+
+                        });
+
+
+                    });
+                } else {
+                }
+                // if (item.photos)
+                //     Product.findByIdAndUpdate(item._id, {thumbnail: item.photos[0]}, function (err, products) {
+                //     })
 
             })
         })
