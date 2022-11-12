@@ -12,6 +12,12 @@ export default [
         "access": "admin_user,admin_shopManager",
         "controller": controller.statusZibal,
 
+    },{
+        "path": "/verify",
+        "method": "get",
+        "access": "admin_user,admin_shopManager",
+        "controller": controller.verify,
+
     },
     {
         "path": "/count",
@@ -28,23 +34,23 @@ export default [
         "path": "/buy/:_id",
         "method": "get",
         "access": "customer_all",
-        "controller": controller.buyZibal,
+        "controller": controller.buy,
     },
     {
         "path": "/buy/:_id",
         "method": "post",
         "access": "customer_all",
-        "controller": controller.buyZibal,
+        "controller": controller.buy,
     }, {
         "path": "/buy/:_id/:_price",
         "method": "get",
         "access": "customer_all",
-        "controller": controller.buyZibal,
+        "controller": controller.buy,
     }, {
         "path": "/buy/:_id/:_price",
         "method": "post",
         "access": "customer_all",
-        "controller": controller.buyZibal,
+        "controller": controller.buy,
     },
     {
         "path": "/:offset/:limit",

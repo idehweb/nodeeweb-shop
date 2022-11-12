@@ -1,4 +1,3 @@
-
 import model from './model.mjs'
 import routes from './routes.mjs'
 
@@ -20,11 +19,41 @@ export default {
         },
         "create": {
             "fields": [
-                {name: "name", type: "object"},
-                {name: "slug", type: "string"},
-                {name: "order", type: "number"},
-                {name: "kind", type: "string"},
-                // {name: "parent", type: "reference", reference: "ProductCategory"}
+                {"name": "name", "type": "object", "kind": "multiLang", "size": {"lg": 12, "sm": 12}},
+
+                {"name": "slug", "type": "string"},
+                {"name": "order", "type": "number"},
+                {"name": "kind", "type": "string"},
+                {
+                    "name": "parent",
+                    "type": "select",
+                    "entity": "ProductCategory",
+                    "optionName": "slug",
+                    "optionValue": "_id",
+                    "defaultValue": null,
+                    "limit": 2000,
+                    "size": {"lg": 6, "sm": 12}
+                }
+            ]
+        }, "edit": {
+            "fields": [
+                {"name": "_id", "type": "string", "disabled": true},
+
+                {"name": "name", "type": "object", "kind": "multiLang", "size": {"lg": 12, "sm": 12}},
+
+                {"name": "slug", "type": "string"},
+                {"name": "order", "type": "number"},
+                {"name": "kind", "type": "string"},
+                {
+                    "name": "parent",
+                    "type": "select",
+                    "entity": "ProductCategory",
+                    "optionName": "slug",
+                    "optionValue": "_id",
+                    "defaultValue": null,
+                    "limit": 2000,
+                    "size": {"lg": 6, "sm": 12}
+                }
             ]
         }
     },

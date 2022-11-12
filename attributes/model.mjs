@@ -14,7 +14,7 @@ export default (mongoose)=>{
         image: String,
         data: {},
         values:[],
-        parent:{type: mongoose.Schema.Types.ObjectId, ref: 'Attributes'} //category_id
+        // parent:{type: mongoose.Schema.Types.ObjectId, ref: 'Attributes'} //category_id
     });
     return AttributesSchema
 

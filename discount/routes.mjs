@@ -1,3 +1,4 @@
+import controller from './controller.mjs'
 export default [
     {
         "path": "/",
@@ -8,6 +9,11 @@ export default [
         "path": "/count",
         "method": "get",
         "access": "admin_user,admin_shopManager",
+    }, {
+        "path": "/set/:order_id/:id",
+        "method": "get",
+        "access": "admin_user,admin_shopManager,customer_user",
+        "controller": "admin_user,admin_shopManager,customer_user",
     },
     {
         "path": "/:offset/:limit",

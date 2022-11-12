@@ -175,6 +175,26 @@ Nodeeweb is licensed under the GNU GENERAL PUBLIC LICENSE, sponsored and support
 
 ## Changelogs
 
+== 0.0.16   
+    update transaction controller
+
+
+== 0.0.15
+    update routes
+
+== 0.0.13
+    change and update routes fields
+
+
+== 0.0.12
+    add discount functions
+    add gateways
+
+== 0.0.11
+    add defaultValue
+    add optionName
+    add optionValue
+
 == 0.0.10
     add transaction
 

@@ -5,144 +5,6 @@ import fs from 'fs'
 import https from 'https'
 
 let self = ({
-
-    getAll: function (req, res, next) {
-        let Product = req.mongoose.model('Product');
-        if (req.headers.response !== "json") {
-            return res.show()
-
-        }
-        console.log('==> getAll()', Product);
-        let offset = 0;
-        if (req.params.offset) {
-            offset = parseInt(req.params.offset);
-        }
-        let fields = '';
-        if (req.headers && req.headers.fields) {
-            fields = req.headers.fields
-        }
-        let search = {};
-        if (req.params.search) {
-
-            search["title." + req.headers.lan] = {
-                $exists: true,
-                "$regex": req.params.search,
-                "$options": "i"
-            };
-        }
-        if (req.query.search) {
-
-            search["title." + req.headers.lan] = {
-                $exists: true,
-                "$regex": req.query.search,
-                "$options": "i"
-            };
-        }
-        if (req.query.Search) {
-
-            search["title." + req.headers.lan] = {
-                $exists: true,
-                "$regex": req.query.Search,
-                "$options": "i"
-            };
-        }
-        if (req.query) {
-            console.log(req.query);
-        }
-        // return res.json(Product.schema.paths);
-        // console.log("Product.schema => ",Product.schema.paths);
-        // console.log(Object.keys(req.query));
-        let tt = Object.keys(req.query);
-        // console.log('type of tt ==> ', typeof tt);
-        // console.log("tt => ", tt);
-        _.forEach(tt, (item) => {
-            // console.log("item => ",item);
-            if (Product.schema.paths[item]) {
-                // console.log("item exists ====>> ",item);
-                // console.log("instance of item ===> ",Product.schema.paths[item].instance);
-                let split = req.query[item].split(',');
-                if (mongoose.isValidObjectId(split[0])) {
-                    search[item] = {
-                        $in: split
-                    }
-                }
-
-            }
-            else {
-                console.log("filter doesnot exist => ", item);
-            }
-        });
-        console.log('search', search);
-        let thef = '';
-        if (req.query.filter) {
-            if (JSON.parse(req.query.filter)) {
-                thef = JSON.parse(req.query.filter);
-            }
-        }
-        console.log('thef', thef);
-        if (thef && thef != '')
-            search = thef;
-        // console.log(req.mongoose.Schema(Product))
-        console.log('search', search)
-        var q;
-        if (search['productCategory.slug']) {
-            let ProductCategory = req.mongoose.model('ProductCategory');
-
-            console.log('search[\'productCategory.slug\']', search['productCategory.slug'])
-            ProductCategory.findOne({slug: search['productCategory.slug']}, function (err, productcategory) {
-                console.log('err',err)
-                console.log('req',productcategory)
-                if (err || !productcategory)
-                    return res.json([]);
-                if(productcategory._id){
-                    // console.log({productCategory: {
-                    //         $in:[productcategory._id]
-                    //     }})
-                    Product.find({"productCategory": productcategory._id}, function (err, products) {
-
-                        Product.countDocuments({"productCategory": productcategory._id}, function (err, count) {
-                            if (err || !count) {
-                                res.json([]);
-                                return 0;
-                            }
-                            res.setHeader(
-                                "X-Total-Count",
-                                count
-                            );
-                            return res.json(products);
-
-                        })
-                    }).populate('productCategory','_id slug').skip(offset).sort({_id: -1}).limit(parseInt(req.params.limit));
-                }
-
-            });
-            // console.log('q', q)
-        } else {
-            console.log('no \'productCategory.slug\'')
-            q = Product.find(search, fields).populate('productCategory','_id slug').skip(offset).sort({_id: -1}).limit(parseInt(req.params.limit));
-            q.exec(function (err, model) {
-
-                console.log('err', err)
-                if (err || !model)
-                    return res.json([]);
-                Product.countDocuments(search, function (err, count) {
-                    // console.log('countDocuments', count);
-                    if (err || !count) {
-                        res.json([]);
-                        return 0;
-                    }
-                    res.setHeader(
-                        "X-Total-Count",
-                        count
-                    );
-                    return res.json(model);
-
-                })
-            });
-        }
-
-    },
-
     importFromWordpress: function (req, res, next) {
         let url = '';
         if (req.query.url) {
@@ -202,13 +64,13 @@ let self = ({
         let Media = req.mongoose.model('Media');
         Product.find({}, function (err, products) {
             _.forEach(products, (item) => {
-                let obj = {};
+                let obj={};
 
-                if (item.data.regular_price) {
-                    obj['price'] = item.data.regular_price;
+                if (item.data.regular_price){
+                    obj['price']=item.data.regular_price;
                 }
-                if (item.data.regular_price) {
-                    obj['salePrice'] = item.data.sale_price;
+                if (item.data.regular_price){
+                    obj['salePrice']=item.data.sale_price;
                 }
                 Product.findByIdAndUpdate(item._id, obj, function (err, products) {
                 })
@@ -242,10 +104,10 @@ let self = ({
                             mimtype = mime.getType(type),
                             filePath = path.join(__dirname, "./public_media/customer/", name),
                             fstream = fs.createWriteStream(filePath);
-                        console.log('name', filename)
-                        console.log('getting mainUrl', req.query.url + mainUrl);
+                        console.log('name',filename)
+                        console.log('getting mainUrl', req.query.url+mainUrl);
 
-                        https.get(req.query.url + mainUrl, function (response) {
+                        https.get(req.query.url+mainUrl, function (response) {
                             response.pipe(fstream);
                         });
 

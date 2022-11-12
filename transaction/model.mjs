@@ -5,8 +5,10 @@ export default (mongoose) => {
         orderNumber: Number,
         customer: {type: mongoose.Schema.Types.ObjectId, ref: "Customer"}, //order_id
         Authority: String,
+        gatewayResponse: String,
         time: Number,
         payme_tid: String,
+        method: String,
         transaction: Number,
 
         create_time: Number,

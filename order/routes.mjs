@@ -8,6 +8,8 @@ export default [
         "path": "/createByCustomer",
         "method": "post",
         "access": "admin_user,admin_shopManager,customer_user",
+        "controller": controller.createByCustomer,
+
     },
     {
         "path": "/count",

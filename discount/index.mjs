@@ -21,7 +21,14 @@ export default {
             ]
         },
         "create": {
-            "fields": [{"name": "title", "type": "string"},]
+            "fields": [
+                {"name": "name", "type": "string"},
+                {"name": "slug", "type": "string"},
+                {"name": "count", "type": "string"},
+                {"name": "price", "type": "string"},
+                {"name": "createdAt", "type": "date"},
+                {"name": "updatedAt", "type": "date"},
+            ]
         },
         "edit": {
             "fields": [

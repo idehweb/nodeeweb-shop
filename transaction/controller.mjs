@@ -11,6 +11,141 @@
 var self = ({
     buy: function (req, res, next) {
         let Order = req.mongoose.model('Order');
+        let Product = req.mongoose.model('Product');
+        let Transaction = req.mongoose.model('Transaction');
+        let Gateway = req.mongoose.model('Gateway');
+
+        console.log("buy...", req.params._id, req.params._price);
+        if (req.params._price && (req.params._price == null || req.params._price == "null"))
+            return res.json({
+                success: false,
+                message: "req.params._price"
+            });
+        if (req.body.method)
+            Gateway.findOne({slug: req.body.method}, function (err, gateway) {
+                if (!gateway.request) {
+                    return res.json({
+                        success: false,
+                        slug: req.body.method,
+                        // gateway: gateway,
+                        message: "gateway request not found"
+                    })
+                }
+
+
+                Order.findById(req.params._id, "sum , orderNumber , amount , discount , customer",
+                    function (err, order) {
+                        if (err || !order) {
+                            res.json({
+                                success: false,
+                                message: "error!"
+                            });
+                            return 0;
+                        }
+
+                        // obj[]=;
+// console.log(order.amount/);
+//                 return;
+                        let amount = parseInt(order.amount) * 10;
+                        if (req.params._price) {
+                            amount = parseInt(req.params._price) * 10;
+                        }
+                        if (order.discount) {
+                            amount = amount - (order.discount * 10);
+                        }
+                        if (amount < 0) {
+                            amount = 0;
+                        }
+                        if (amount > 500000000) {
+                            return res.json({
+                                success: false,
+                                message: "price is more than 50,000,000T"
+                            });
+                        }
+                        //check if we have method or not,
+                        // for both we have to create transaction
+                        //    if we have method, submit method too
+                        console.log('order.orderNumber', order.orderNumber)
+                        gateway.request = gateway.request.replace("%domain%", process.env.BASE_URL);
+                        gateway.request = gateway.request.replace("%amount%", order.amount);
+                        gateway.request = gateway.request.split("%orderNumber%").join(order.orderNumber);
+                        // gateway.request = gateway.request.replace("%orderNumber%", order.orderNumber);
+                        gateway.request = gateway.request.replace("%orderId%", order._id);
+                        console.log('gateway.request', gateway.request);
+                        if (!JSON.parse(gateway.request))
+                            return res.json({
+                                success: false,
+                                gateway: JSON.parse(gateway.request),
+                                message: "gateway request not found"
+                            })
+                        // let sendrequest=
+                        req.httpRequest(JSON.parse(gateway.request)).then(function (parsedBody) {
+
+                            let obj = {
+                                "amount": amount,
+                                "method": req.body.method,
+                                "order": req.params._id,
+                                "gatewayResponse": JSON.stringify(parsedBody["data"])
+                                // Authority: parsedBody["trackId"]
+                            };
+                            if (req.headers && req.headers.customer && req.headers.customer._id) {
+                                obj["customer"] = req.headers.customer._id;
+                            }
+                            // return res.json({
+                            //     ...obj, gateway: JSON.parse(gateway.request),
+                            // });
+                            Transaction.create(obj, function (err, transaction) {
+                                if (err || !transaction) {
+                                    return res.json({
+                                        success: false,
+                                        message: "transaction could not be created",
+                                        err: err
+                                    })
+                                }
+                                Order.findByIdAndUpdate(req.params._id, {
+                                    $push: {
+                                        transaction: transaction._id
+                                    }
+                                }, function (order_err, updated_order) {
+
+                                    if (parsedBody['data'] && parsedBody['data'].trackId) {
+
+                                        return res.json({
+                                            success: true,
+                                            // data: parsedBody['data'],
+                                            // request: JSON.parse(gateway.request),
+                                            url: "https://gateway.zibal.ir/start/" + parsedBody['data'].trackId
+                                        });
+                                    } else {
+                                        return res.json({
+                                            success: false,
+                                            // data: parsedBody['data'],
+                                            // request: JSON.parse(gateway.request),
+                                            parsedBody: parsedBody['data']
+                                        });
+                                    }
+                                });
+                            });
+
+                        }).catch(e => res.json({e, requ: JSON.parse(gateway.request)}))
+
+
+                    }).populate("customer", "_id phoneNumber firstName lastName");
+            })
+        else {
+            return res.json({
+                success: false,
+                message: "you have no gateway"
+            })
+        }
+        // req.global.getSetting("ZIBAL_TOKEN").then((merchant) => {
+        //     console.log('merchant', merchant)
+
+        // }).catch(e => res.json(e))
+    },
+
+    buyZarinpal: function (req, res, next) {
+        let Order = req.mongoose.model('Order');
 
         console.log("buying...");
         Order.findById(req.params._id, "sum , orderNumber , amount",
@@ -152,6 +287,8 @@ var self = ({
                             return res.json({
                                 success: false,
                                 merchant: merchant,
+                                zibal: 'sdf',
+
                                 message: parsedBody['message']
                             })
                         }
@@ -856,6 +993,91 @@ var self = ({
         });
     },
 
+    verify_old: function (req, res, next) {
+        let Order = req.mongoose.model('Order');
+        let Product = req.mongoose.model('Product');
+        let Transaction = req.mongoose.model('Transaction');
+        let Customer = req.mongoose.model('Customer');
+        Transaction.findOne({Authority: req.params.bank_token}, function (
+            err,
+            transaction
+        ) {
+
+            if (err || !transaction) {
+                res.json({
+                    success: false,
+                    message: "error!",
+                    err: err,
+                    Authority: req.body.token
+                });
+                return;
+            }
+
+            Transaction.findByIdAndUpdate(
+                transaction._id,
+                {
+                    RefID: req.body.RefNo,
+                    statusCode: req.body.ResCod,
+                    updatedAt: new Date()
+                },
+                {new: true},
+                function (err, transaction) {
+                    if (err || !transaction) {
+                        res.json({
+                            success: false,
+                            message: "error!",
+                            err: err
+                        });
+                    }
+                    let qc = 0;
+                    let obj = {};
+
+                    if (transaction.order_obj) {
+                        if (transaction.order_obj.questionCount) {
+                            qc = transaction.order_obj.questionCount;
+                        }
+                        if (
+                            transaction.order_obj.goldScore ||
+                            transaction.order_obj.silverScore
+                        ) {
+                            obj = transaction.order_obj;
+                        }
+                    }
+                    Customer.findByIdAndUpdate(
+                        transaction.customer_obj._id,
+                        {
+                            $inc: {question_credit: +qc},
+                            $push: {pocket: obj},
+                            updatedAt: new Date()
+                        },
+                        {new: true},
+                        function (err, customer) {
+                            if (err || !customer) {
+                                res.json({
+                                    success: false,
+                                    err: err,
+                                    message: "user updated wrong"
+                                });
+                                return;
+                            }
+                            tttl = "پرداخت موفق";
+                            tttx = "پکیج به حساب شما اضافه شد.";
+
+                            res.json({
+                                success: true,
+                                RefID: req.body.RefNo,
+                                transaction: transaction._id,
+                                Status: req.body.ResCod,
+                                customer_obj: transaction.customer_obj,
+                                order_obj: transaction.order_obj
+                            });
+
+                        }
+                    );
+                }
+            );
+        });
+    },
     verify: function (req, res, next) {
         let Order = req.mongoose.model('Order');
         let Product = req.mongoose.model('Product');
