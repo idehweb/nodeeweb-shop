@@ -15,6 +15,7 @@ export default (mongoose)=>{
         salePrice: Number,
         data: {},
         sku: String,
+        extra_button: String,
         miniTitle: {},
         excerpt: {},
         options: [],

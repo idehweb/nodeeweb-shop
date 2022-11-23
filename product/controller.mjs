@@ -216,6 +216,161 @@ let self = ({
             })
         })
     },
+    torob: function (req, res, next) {
+        console.log("it is Torob!");
+        let offset = 0;
+        if (req.params.offset) {
+            offset = parseInt(req.params.offset);
+        }
+        let searchf = {};
+        searchf["title.fa"] = {
+            $exists: true
+        };
+        let Product = req.mongoose.model('Product');
+
+        // _id:'61d71cf4365a2313a161456c'
+        Product.find({}, "_id title price type salePrice in_stock combinations firstCategory secondCategory thirdCategory slug", function (err, products) {
+            console.log('err',err)
+            console.log('products',products)
+            if (err || !products) {
+                return res.json([]);
+            }
+
+            function arrayMin(t) {
+                var arr = [];
+                t.map((item) => (item != 0) ? arr.push(item) : false);
+                if (arr && arr.length > 0)
+                    return arr.reduce(function (p, v) {
+                        console.log("p", p, "v", v);
+                        return (p < v ? p : v);
+                    });
+                else
+                    return false;
+            }
+
+            let modifedProducts = [];
+            _.forEach(products, (c, cx) => {
+                let price_array = [];
+                let sale_array = [];
+                let price_stock = [];
+                let last_price = 0;
+                let last_sale_price = 0;
+
+                if (c.combinations && c.type == "variable") {
+                    _.forEach(c.combinations, (comb, cxt) => {
+                        if (comb.price && comb.price != null && parseInt(comb.price) != 0) {
+                            price_array.push(parseInt(comb.price));
+                        } else {
+                            price_array.push(0);
+
+                        }
+                        if (comb.salePrice && comb.salePrice != null && parseInt(comb.salePrice) != 0) {
+                            sale_array.push(parseInt(comb.salePrice));
+
+                        } else {
+                            sale_array.push(0);
+                        }
+                        if (comb.in_stock && !comb.quantity) {
+                            comb.in_stock = false;
+                        }
+                        price_stock.push(comb.in_stock);
+                        //
+                        // if (parseInt(comb.price) < parseInt(last_price))
+                        //     last_price = parseInt(comb.price);
+                    });
+                }
+                if (c.type == "normal") {
+                    price_array = [];
+                    sale_array = [];
+                    price_stock = [];
+                    if (c.price && c.price != null)
+                        price_array.push(c.price);
+                }
+                last_price = arrayMin(price_array);
+                last_sale_price = arrayMin(sale_array);
+                console.log("last price", last_price, last_sale_price);
+
+                if ((last_price !== false && last_sale_price !== false) && (last_price < last_sale_price)) {
+                    console.log("we have got here");
+                    var cd = price_array.indexOf(last_price);
+                    if (sale_array[cd] && sale_array[cd] != 0)
+                        last_sale_price = sale_array[cd];
+                    else
+                        last_sale_price = false;
+                    // if(sale_array[cd] && (sale_array[cd]<last_sale_price)){
+                    //
+                    // }
+
+                } else if ((last_price !== false && last_sale_price !== false) && (last_price > last_sale_price)) {
+                    console.log("we have got there");
+
+                    // last_price = last_sale_price;
+                    // last_sale_price = tem;
+
+                    var cd = sale_array.indexOf(last_sale_price);
+                    if (price_array[cd] && price_array[cd] != 0)
+                        last_price = price_array[cd];
+                    // else {
+                    // last_sale_price = false;
+                    var tem = last_price;
+
+                    last_price = last_sale_price;
+                    last_sale_price = tem;
+                    // }
+                }
+
+                //
+                // if (last_sale_price) {
+                //     var tem = last_price;
+                //     last_price = last_sale_price;
+                //     last_sale_price = tem;
+                //
+                // }
+                if (c.type == "normal") {
+                    price_array = [];
+                    sale_array = [];
+                    price_stock = [];
+                    if (c.in_stock) {
+                        price_stock.push(true);
+                    }
+                    if (c.price && c.price != null)
+                        price_array.push(c.price);
+                }
+                console.log("price_stock", price_stock);
+
+
+
+                let slug = c.slug;
+                let cat_inLink = "";
+                if (c.firstCategory && c.firstCategory.slug)
+                    cat_inLink = c.firstCategory.slug;
+                if (c.secondCategory && c.secondCategory.slug)
+                    cat_inLink = c.secondCategory.slug;
+                if (c.thirdCategory && c.thirdCategory.slug)
+                    cat_inLink = c.thirdCategory.slug;
+                modifedProducts.push({
+                    product_id: c._id,
+                    // page_url: CONFIG.SHOP_URL + "p/" + c._id + "/" + encodeURIComponent(c.title.fa),
+                    page_url: process.env.BASE_URL +"/product/"+c._id+"/"+ c.slug,
+                    price: last_price,
+                    old_price: last_sale_price,
+                    availability: (price_stock.indexOf(true) >= 0 ? "instock" : "outofstock")
+                    // comb: price_array,
+                    // combSale: sale_array,
+                    // price_stock: price_stock,
+
+                });
+            });
+            return res.json(modifedProducts);
+
+
+        }).skip(offset).sort({
+            updatedAt: -1,
+            createdAt: -1
+            // "combinations.in_stock": -1,
+        }).limit(parseInt(req.params.limit)).lean();
+    },
+
     rewriteProductsImages: function (req, res, next) {
         let Product = req.mongoose.model('Product');
         let Media = req.mongoose.model('Media');
@@ -290,7 +445,138 @@ let self = ({
 
             })
         })
+    },
+    viewOneS: function (req, res, next) {
+        console.log("===> viewOneS() ");
+        return new Promise(function (resolve, reject) {
+            console.log('req.params._id', req.params);
+            const arrayMin = (arr) => {
+                if (arr && arr.length > 0)
+                    return arr.reduce(function (p, v) {
+                        return (p < v ? p : v);
+                    });
+            };
+            let obj = {};
+            if (req.mongoose.isValidObjectId(req.params._slug)) {
+                obj["_id"] = req.params._slug;
+            } else {
+                obj["slug"] = req.params._slug;
+
+            }
+            if (req.mongoose.isValidObjectId(req.params._id)) {
+                obj["_id"] = req.params._id;
+                delete obj["slug"];
+            }
+            let Product = req.mongoose.model('Product');
+
+            Product.findOne(obj, "title metadescription keywords excerpt type price in_stock salePrice combinations thumbnail photos slug labels _id",
+                function (err, product) {
+                    if (err || !product) {
+                        resolve({});
+                        return 0;
+                    }
+                    let in_stock = "outofstock";
+                    let product_price = 0;
+                    let product_old_price = 0;
+                    let product_prices = [];
+                    let product_sale_prices = [];
+                    if (product.type === "variable") {
+                        if (product.combinations)
+                            _.forEach(product.combinations, (c) => {
+                                if (c.in_stock) {
+                                    in_stock = "instock";
+                                    product_prices.push(parseInt(c.price) || 1000000000000);
+                                    product_sale_prices.push(parseInt(c.salePrice) || 1000000000000);
+                                }
+
+                            });
+                        // console.log("gfdsdf");
+                        // console.log(product_prices);
+                        // console.log(product_sale_prices);
+                        let min_price = arrayMin(product_prices);
+                        let min_sale_price = arrayMin(product_sale_prices);
+                        // console.log("min_price", min_price);
+                        // console.log("min_sale_price", min_sale_price);
+                        product_price = min_price;
+                        if (min_sale_price > 0 && min_sale_price < min_price) {
+                            product_price = min_sale_price;
+                            product_old_price = min_price;
+                        }
+                    }
+                    if (product.type === "normal") {
+                        if (product.in_stock) {
+                            in_stock = "instock";
+                        }
+                        if (product.price) {
+                            product_price = product.price;
+                        }
+                        if (product.price && product.salePrice) {
+                            product_price = product.salePrice;
+                            product_old_price = product.price;
+                        }
+                    }
+
+                    // product.title = product['title'][req.headers.lan] || '';
+                    // product.description = '';
+                    // console.log(c);
+                    // });
+                    delete product.data;
+                    delete product.transaction;
+                    console.log(" product", product);
+                    let img = '';
+                    if (product.photos && product.photos[0]) {
+                        img = product.photos[0]
+
+                    }
+                    if (product.thumbnail) {
+                        img = product.thumbnail
+                    }
+
+                    let obj = {
+                        _id: product._id,
+                        product_price: product_price || "",
+                        product_old_price: product_old_price || "",
+                        availability: in_stock || "",
+                        image: img,
+                        keywords: "",
+                        metadescription: "",
+                    };
+                    if (product["keywords"]) {
+                        obj["keywords"] = product["keywords"][req.headers.lan] || product["keywords"];
+
+                    }
+                    if (product["metadescription"]) {
+                        obj["metadescription"] = product["metadescription"][req.headers.lan] || product["metadescription"];
+
+                    }
+                    if (product["title"]) {
+                        obj["title"] = product["title"][req.headers.lan] || product["title"];
+                    } else {
+                        obj["title"] = "";
+                    }
+                    if (product["product_name"]) {
+                        obj["product_name"] = product["product_name"][req.headers.lan] || product["product_name"];
+                    } else {
+                        obj["product_name"] = "";
+                    }
+                    if (product["description"]) {
+                        obj["description"] = product["description"][req.headers.lan] || product["description"];
+                    } else {
+                        obj["description"] = "";
+                    }
+                    if (product["slug"]) {
+                        obj["slug"] = product["slug"];
+                    }
+                    if (product["labels"]) {
+                        obj["labels"] = product["labels"];
+                    }
+                    resolve(obj);
+                    return 0;
+
+                }).lean();
+        });
     }
+
 
 
 });

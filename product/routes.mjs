@@ -16,6 +16,12 @@ export default [
         "controller": controller.getAll,
 
         // "access": "admin_user,admin_shopManager,customer_all",
+    },  {
+        "path": "/torob/:offset/:limit",
+        "method": "get",
+        "controller": controller.torob,
+
+        // "access": "admin_user,admin_shopManager,customer_all",
     },
     {
         "path": "/:id",

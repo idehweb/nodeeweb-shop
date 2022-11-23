@@ -112,7 +112,8 @@ export default {
                     }],
                     "size": {"lg": 12, "sm": 12}
                 },
-                {"name": "photo", "type": "images", "size": {"lg": 12, "sm": 12}},
+                {"name": "thumbnail","label":"Thumbnail", "type": "images", "size": {"lg": 12, "sm": 12}},
+                {"name": "photos","label":"Gallery", "type": "arrayOfImages", "size": {"lg": 12, "sm": 12}},
 
 
             ]
@@ -208,12 +209,17 @@ export default {
                     }],
                     "size": {"lg": 12, "sm": 12}
                 },
-                {"name": "photo", "type": "images", "size": {"lg": 12, "sm": 12}},
+                {"name": "thumbnail","label":"Thumbnail", "type": "image", "size": {"lg": 12, "sm": 12}},
 
+                {"name": "photos","label":"Gallery", "type": "images", "size": {"lg": 12, "sm": 12}},
 
             ]
         },
     },
+    "front": [{
+        "routes": (req, res, next) => {
+        }
+    }],
     "views": [{
         "func": (req, res, next) => {
         }

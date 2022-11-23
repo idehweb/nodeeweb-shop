@@ -175,6 +175,21 @@ Nodeeweb is licensed under the GNU GENERAL PUBLIC LICENSE, sponsored and support
 
 ## Changelogs
 
+== 0.0.21
+    update torob
+
+== 0.0.20
+    added torob
+
+== 0.0.19
+    update photos and thumbnail type
+
+== 0.0.18
+    add photos and thumbnail
+   
+== 0.0.17   
+    update product controller
+    
 == 0.0.16   
     update transaction controller
 
