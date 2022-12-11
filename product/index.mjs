@@ -228,5 +228,6 @@ export default {
         "func": (req, res, next) => {
         }
     }],
+    "sitemap":true
 
 }

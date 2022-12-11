@@ -67,4 +67,6 @@ export default {
         }
     }],
 
+    "sitemap":true
+
 }

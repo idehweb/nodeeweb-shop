@@ -66,12 +66,12 @@ var self = ({
                         // for both we have to create transaction
                         //    if we have method, submit method too
                         console.log('order.orderNumber', order.orderNumber)
-                        gateway.request = gateway.request.replace("%domain%", process.env.BASE_URL);
-                        gateway.request = gateway.request.replace("%amount%", order.amount);
+                        gateway.request = gateway.request.replaceAll("%domain%", process.env.BASE_URL);
+                        gateway.request = gateway.request.replaceAll("%amount%", order.amount);
                         gateway.request = gateway.request.split("%orderNumber%").join(order.orderNumber);
                         // gateway.request = gateway.request.replace("%orderNumber%", order.orderNumber);
-                        gateway.request = gateway.request.replace("%orderId%", order._id);
-                        console.log('gateway.request', gateway.request);
+                        gateway.request = gateway.request.replaceAll("%orderId%", order._id);
+                        // console.log('gateway.request', gateway.request);
                         if (!JSON.parse(gateway.request))
                             return res.json({
                                 success: false,
@@ -107,7 +107,13 @@ var self = ({
                                         transaction: transaction._id
                                     }
                                 }, function (order_err, updated_order) {
-
+                                    console.log('parsedBody',parsedBody);
+                                    if (parsedBody['data'] && parsedBody['data']['url']) {
+                                        return res.json({
+                                            success: true,
+                                            url: parsedBody['data']['url']
+                                        });
+                                    }
                                     if (parsedBody['data'] && parsedBody['data'].trackId) {
 
                                         return res.json({

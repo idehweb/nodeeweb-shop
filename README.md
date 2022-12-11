@@ -175,6 +175,12 @@ Nodeeweb is licensed under the GNU GENERAL PUBLIC LICENSE, sponsored and support
 
 ## Changelogs
 
+== 0.0.24
+    change transaction buy function
+
+== 0.0.23
+    add sitemap to product and product_category
+
 == 0.0.22
     add extra button
 

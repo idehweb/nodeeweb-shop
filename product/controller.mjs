@@ -119,6 +119,7 @@ let self = ({
             // console.log('q', q)
         } else {
             console.log('no \'productCategory.slug\'')
+            search['status']='published'
             q = Product.find(search, fields).populate('productCategory','_id slug').skip(offset).sort({_id: -1}).limit(parseInt(req.params.limit));
             q.exec(function (err, model) {
 
@@ -144,6 +145,60 @@ let self = ({
     },
 
     importFromWordpress: function (req, res, next) {
+        let url = '';
+        if (req.query.url) {
+            url = req.query.url;
+        }
+        if (req.query.consumer_secret) {
+            url += '?consumer_secret=' + req.query.consumer_secret;
+        }
+        if (req.query.consumer_key) {
+            url += '&consumer_key=' + req.query.consumer_key;
+        }
+
+        if (req.query.per_page) {
+            url += '&per_page=' + req.query.per_page;
+        }
+        if (req.query.page) {
+            url += '&page=' + req.query.page;
+        }
+        console.log('importFromWordpress', url);
+        let count = 0;
+        req.httpRequest({
+            method: "get",
+            url: url,
+        }).then(function (response) {
+            count++;
+            let x = count * parseInt(req.query.per_page)
+            let Product = req.mongoose.model('Product');
+
+            response.data.forEach((dat) => {
+                let obj = {};
+                if (dat.name) {
+                    obj['title'] = {
+                        fa: dat.name
+
+                    }
+                }
+                if (dat.description) {
+                    obj['description'] = {
+                        fa: dat.description
+
+                    }
+                }
+
+                if (dat.slug) {
+                    obj['slug'] = dat.name.split(' ').join('-') + 'x' + x;
+                }
+                obj['data'] = dat;
+                Product.create(obj)
+            });
+            // return res.json(response.data)
+        });
+
+
+    },
+    importFromWebzi: function (req, res, next) {
         let url = '';
         if (req.query.url) {
             url = req.query.url;
@@ -350,6 +405,8 @@ let self = ({
                     cat_inLink = c.thirdCategory.slug;
                 modifedProducts.push({
                     product_id: c._id,
+                    name: ((c.title && c.title.fa) ? c.title.fa : ""),
+
                     // page_url: CONFIG.SHOP_URL + "p/" + c._id + "/" + encodeURIComponent(c.title.fa),
                     page_url: process.env.BASE_URL +"/product/"+c._id+"/"+ c.slug,
                     price: last_price,
@@ -576,7 +633,6 @@ let self = ({
                 }).lean();
         });
     }
-
 
 
 });

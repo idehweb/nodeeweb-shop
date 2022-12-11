@@ -66,7 +66,7 @@ export default (mongoose) => {
         order_id: {
             type: 'string',
             default: crypto.randomBytes(64).toString('hex'),
-            unique: true
+            // unique: true
         },
         amount: {
             type: 'number',

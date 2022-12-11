@@ -4,6 +4,8 @@ export default [
         "path": "/",
         "method": "get",
         "access": "admin_user,admin_shopManager",
+        "controller": controller.all,
+
     },{
         "path": "/createByCustomer",
         "method": "post",
@@ -32,6 +34,8 @@ export default [
         "path": "/:offset/:limit",
         "method": "get",
         "access": "admin_user,admin_shopManager",
+        "controller": controller.all,
+
     },
     {
         "path": "/:id",
@@ -42,6 +46,8 @@ export default [
         "path": "/",
         "method": "post",
         "access": "admin_user,admin_shopManager",
+        "controller": controller.createAdmin,
+
     },
     {
         "path": "/:id",
