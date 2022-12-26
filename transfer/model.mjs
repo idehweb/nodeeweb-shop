@@ -1,6 +1,7 @@
 console.log('#model transfer')
 export default (mongoose) => {
     const TransferSchema = new mongoose.Schema({
+
         createdAt: {type: Date, default: Date.now},
         updatedAt: {type: Date, default: Date.now},
         active: {type: Boolean, default: true},

@@ -10,6 +10,8 @@ export default (mongoose)=>{
         price: Number,
         percent: Number,
         count: Number,
+        customer: [{ type: mongoose.Schema.Types.ObjectId, ref: "Customer" }],
+
         createdAt: { type: Date, default: Date.now },
         updatedAt: { type: Date, default: Date.now },
     });

@@ -1,5 +1,3 @@
-import Attributes from "#models/attributes";
-import Post from "#models/post";
 import _ from "lodash";
 // const rp from 'request-promise');
 

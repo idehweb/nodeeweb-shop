@@ -175,6 +175,27 @@ Nodeeweb is licensed under the GNU GENERAL PUBLIC LICENSE, sponsored and support
 
 ## Changelogs
 
+== 0.0.31
+    add attributes to customer routes
+
+== 0.0.30
+    set discount code
+
+== 0.0.29
+    remove bugs from product controller
+
+== 0.0.28
+    remove bugs from product controller
+
+== 0.0.27
+    add weight
+
+== 0.0.26
+    move gateway to core
+
+== 0.0.25
+    add order by admin
+
 == 0.0.24
     change transaction buy function
 

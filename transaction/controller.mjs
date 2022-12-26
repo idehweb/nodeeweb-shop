@@ -33,7 +33,7 @@ var self = ({
                 }
 
 
-                Order.findById(req.params._id, "sum , orderNumber , amount , discount , customer",
+                Order.findById(req.params._id, "sum , orderNumber , amount , discount , customer , _id",
                     function (err, order) {
                         if (err || !order) {
                             res.json({
@@ -79,12 +79,14 @@ var self = ({
                                 message: "gateway request not found"
                             })
                         // let sendrequest=
+                        console.log('req.params._id',req.params._id)
                         req.httpRequest(JSON.parse(gateway.request)).then(function (parsedBody) {
 
                             let obj = {
                                 "amount": amount,
                                 "method": req.body.method,
-                                "order": req.params._id,
+                                "order": order._id,
+                                "orderNumber": order.orderNumber,
                                 "gatewayResponse": JSON.stringify(parsedBody["data"])
                                 // Authority: parsedBody["trackId"]
                             };

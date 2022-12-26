@@ -46,8 +46,9 @@ let self = ({
                 "$options": "i"
             };
         }
-        if (req.query) {
-            console.log(req.query);
+        if (req.query && req.query.status) {
+            search={...search,status:req.query.status}
+            console.log('****************req.query', req.query);
         }
         // return res.json(Product.schema.paths);
         // console.log("Product.schema => ",Product.schema.paths);
@@ -61,7 +62,7 @@ let self = ({
                 // console.log("item exists ====>> ",item);
                 // console.log("instance of item ===> ",Product.schema.paths[item].instance);
                 let split = req.query[item].split(',');
-                if (mongoose.isValidObjectId(split[0])) {
+                if (req.mongoose.isValidObjectId(split[0])) {
                     search[item] = {
                         $in: split
                     }
@@ -72,7 +73,7 @@ let self = ({
                 console.log("filter doesnot exist => ", item);
             }
         });
-        console.log('search', search);
+        // console.log('search', search);
         let thef = '';
         if (req.query.filter) {
             if (JSON.parse(req.query.filter)) {
@@ -83,18 +84,17 @@ let self = ({
         if (thef && thef != '')
             search = thef;
         // console.log(req.mongoose.Schema(Product))
-        console.log('search', search)
         var q;
         if (search['productCategory.slug']) {
             let ProductCategory = req.mongoose.model('ProductCategory');
 
             console.log('search[\'productCategory.slug\']', search['productCategory.slug'])
             ProductCategory.findOne({slug: search['productCategory.slug']}, function (err, productcategory) {
-                console.log('err',err)
-                console.log('req',productcategory)
+                console.log('err', err)
+                console.log('req', productcategory)
                 if (err || !productcategory)
                     return res.json([]);
-                if(productcategory._id){
+                if (productcategory._id) {
                     // console.log({productCategory: {
                     //         $in:[productcategory._id]
                     //     }})
@@ -112,22 +112,25 @@ let self = ({
                             return res.json(products);
 
                         })
-                    }).populate('productCategory','_id slug').skip(offset).sort({_id: -1}).limit(parseInt(req.params.limit));
+                    }).populate('productCategory', '_id slug').skip(offset).sort({_id: -1}).limit(parseInt(req.params.limit));
                 }
 
             });
             // console.log('q', q)
         } else {
             console.log('no \'productCategory.slug\'')
-            search['status']='published'
-            q = Product.find(search, fields).populate('productCategory','_id slug').skip(offset).sort({_id: -1}).limit(parseInt(req.params.limit));
+            if (!search['status'])
+                search['status'] = 'published'
+            console.log('search q.exec', search)
+
+            q = Product.find(search, fields).populate('productCategory', '_id slug').skip(offset).sort({_id: -1}).limit(parseInt(req.params.limit));
             q.exec(function (err, model) {
 
                 console.log('err', err)
                 if (err || !model)
                     return res.json([]);
                 Product.countDocuments(search, function (err, count) {
-                    // console.log('countDocuments', count);
+                    console.log('countDocuments', count,model ? model.length : '');
                     if (err || !count) {
                         res.json([]);
                         return 0;
@@ -285,8 +288,8 @@ let self = ({
 
         // _id:'61d71cf4365a2313a161456c'
         Product.find({}, "_id title price type salePrice in_stock combinations firstCategory secondCategory thirdCategory slug", function (err, products) {
-            console.log('err',err)
-            console.log('products',products)
+            console.log('err', err)
+            console.log('products', products)
             if (err || !products) {
                 return res.json([]);
             }
@@ -394,7 +397,6 @@ let self = ({
                 console.log("price_stock", price_stock);
 
 
-
                 let slug = c.slug;
                 let cat_inLink = "";
                 if (c.firstCategory && c.firstCategory.slug)
@@ -408,7 +410,7 @@ let self = ({
                     name: ((c.title && c.title.fa) ? c.title.fa : ""),
 
                     // page_url: CONFIG.SHOP_URL + "p/" + c._id + "/" + encodeURIComponent(c.title.fa),
-                    page_url: process.env.BASE_URL +"/product/"+c._id+"/"+ c.slug,
+                    page_url: process.env.BASE_URL + "/product/" + c._id + "/" + c.slug,
                     price: last_price,
                     old_price: last_sale_price,
                     availability: (price_stock.indexOf(true) >= 0 ? "instock" : "outofstock")

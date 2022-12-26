@@ -11,6 +11,7 @@ export default (mongoose)=>{
         in_stock: { type: Boolean, default: false },
         story: { type: Boolean, default: false },
         price: Number,
+        weight: Number,
         quantity: Number,
         salePrice: Number,
         data: {},

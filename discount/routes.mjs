@@ -13,7 +13,7 @@ export default [
         "path": "/set/:order_id/:id",
         "method": "get",
         "access": "admin_user,admin_shopManager,customer_user",
-        "controller": "admin_user,admin_shopManager,customer_user",
+        "controller": controller.setDiscount
     },
     {
         "path": "/:offset/:limit",

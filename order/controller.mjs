@@ -19,6 +19,10 @@ let self = ({
         //     thirdCategory: req.params._id
         // }];
 
+        if (req.query['customer']) {
+            search['customer']=req.query['customer']
+        }
+
         if (req.query['firstName']) {
             // if (!Array.isArray(search['$or'])) {
             //     search['$or'] = [];
@@ -304,16 +308,19 @@ let self = ({
                                 {order_id: req.body.order_id}, {
                                     $set: {
                                         "billingAddress": req.body.billingAddress,
-                                        "amount": req.body.amount,
+                                        "amount": req.body.discount ? (req.body.amount-req.body.discount) : req.body.amount,
                                         "card": req.body.card,
                                         "customer": req.body.customer,
                                         "customer_data": req.body.customer_data,
+                                        "discount": req.body.discount,
+                                        "discountCode": req.body.discountCode,
                                         "deliveryDay": req.body.deliveryDay,
                                         "deliveryPrice": req.body.deliveryPrice,
                                         // order_id: req.body.order_id,
                                         "status": 'processing',
                                         "package": req.body.package,
-                                        "total": req.body.total,
+                                        "total": req.body.discount ? (req.body.amount-req.body.discount) : req.body.amount,
+
                                         "sum": req.body.sum,
                                     },
                                     $push: {
@@ -323,11 +330,13 @@ let self = ({
                                     if (err || !order) {
                                         console.log('err', err);
                                         Order.create({
-                                            billingAddress: req.body.billingAddress,
-                                            amount: req.body.amount,
+                                            billingAddress:  req.body.billingAddress,
+                                            amount: req.body.discount ? (req.body.amount-req.body.discount) : req.body.amount,
                                             card: req.body.card,
                                             customer: req.body.customer,
                                             customer_data: req.body.customer_data,
+                                            discount: req.body.discount,
+                                            discountCode: req.body.discountCode,
                                             deliveryDay: req.body.deliveryDay,
                                             deliveryPrice: req.body.deliveryPrice,
                                             order_id: req.body.order_id,
@@ -805,7 +814,7 @@ let self = ({
         if (req.body.billingAddress) {
             obj['billingAddress'] = req.body.billingAddress;
         }
-        if (req.body.amount) {
+        if (req.body.amount || req.body.amount==0) {
             obj['amount'] = req.body.amount;
         }
         if (req.body.card) {
@@ -832,7 +841,7 @@ let self = ({
         if (req.body.total) {
             obj['total'] = req.body.total;
         }
-        if (req.body.sum) {
+        if (req.body.sum || req.body.sum==0) {
             obj['sum'] = req.body.sum;
         }
         if (req.body.orderNumber) {
@@ -847,6 +856,9 @@ let self = ({
 
         if (req.body.status == 'checkout')
             status = 'checkout';
+
+
+        // if(req.body.)
         obj['status'] = status;
         if (req.params.id) {
             Order.findByIdAndUpdate(req.params.id, {

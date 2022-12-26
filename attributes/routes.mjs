@@ -12,7 +12,7 @@ export default [
     {
         "path": "/:offset/:limit",
         "method": "get",
-        "access": "admin_user,admin_shopManager",
+        "access": "admin_user,admin_shopManager,customer_all",
     },
     {
         "path": "/:id",
