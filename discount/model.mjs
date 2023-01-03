@@ -1,5 +1,5 @@
 console.log('#model discount')
-export default (mongoose)=>{
+export default (mongoose) => {
     const DiscountSchema = new mongoose.Schema({
         name: {},
         slug: {
@@ -10,10 +10,16 @@ export default (mongoose)=>{
         price: Number,
         percent: Number,
         count: Number,
-        customer: [{ type: mongoose.Schema.Types.ObjectId, ref: "Customer" }],
+        customer: [{type: mongoose.Schema.Types.ObjectId, ref: "Customer"}],
+        excludeProduct: [{type: mongoose.Schema.Types.ObjectId, ref: "Product"}],
+        excludeProductCategory: [{type: mongoose.Schema.Types.ObjectId, ref: "ProductCategory"}],
 
-        createdAt: { type: Date, default: Date.now },
-        updatedAt: { type: Date, default: Date.now },
+        includeProduct: [{type: mongoose.Schema.Types.ObjectId, ref: "Product"}],
+        includeProductCategory: [{type: mongoose.Schema.Types.ObjectId, ref: "ProductCategory"}],
+
+        expire: {type: Date},
+        createdAt: {type: Date, default: Date.now},
+        updatedAt: {type: Date, default: Date.now},
     });
     return DiscountSchema;
 };

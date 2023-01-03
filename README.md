@@ -175,6 +175,15 @@ Nodeeweb is licensed under the GNU GENERAL PUBLIC LICENSE, sponsored and support
 
 ## Changelogs
 
+== 0.0.34
+    usable in filter attrs
+
+== 0.0.33
+    update order , add taxes
+    
+== 0.0.32
+    update transaction / add string math
+
 == 0.0.31
     add attributes to customer routes
 

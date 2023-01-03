@@ -11,8 +11,18 @@ var self = ({
         if (req.params.offset) {
             offset = parseInt(req.params.offset);
         }
-
         let search = {};
+
+        let thef = '';
+        if (req.query.filter) {
+            if (JSON.parse(req.query.filter)) {
+                thef = JSON.parse(req.query.filter);
+            }
+        }
+        console.log('thef', thef);
+        if (thef && thef != '')
+            search = thef;
+        // console.log(req.mongoose.Schema(Product))
         Attributes.find(search, function(err, attributess) {
             if (err || !attributess) {
                 res.json({

@@ -47,7 +47,7 @@ let self = ({
             };
         }
         if (req.query && req.query.status) {
-            search={...search,status:req.query.status}
+            search = {...search, status: req.query.status}
             console.log('****************req.query', req.query);
         }
         // return res.json(Product.schema.paths);
@@ -130,7 +130,7 @@ let self = ({
                 if (err || !model)
                     return res.json([]);
                 Product.countDocuments(search, function (err, count) {
-                    console.log('countDocuments', count,model ? model.length : '');
+                    console.log('countDocuments', count, model ? model.length : '');
                     if (err || !count) {
                         res.json([]);
                         return 0;
@@ -261,13 +261,18 @@ let self = ({
         Product.find({}, function (err, products) {
             _.forEach(products, (item) => {
                 let obj = {};
-
-                if (item.data.regular_price) {
-                    obj['price'] = item.data.regular_price;
+                if (item.price) {
+                    obj['price'] = (item.price /109) * 100
                 }
-                if (item.data.regular_price) {
-                    obj['salePrice'] = item.data.sale_price;
+                if (item.salePrice) {
+                    obj['salePrice'] = (item.salePrice/109) * 100
                 }
+                // if (item.data.regular_price) {
+                //     obj['price'] = item.data.regular_price;
+                // }
+                // if (item.data.regular_price) {
+                //     obj['salePrice'] = item.data.sale_price;
+                // }
                 Product.findByIdAndUpdate(item._id, obj, function (err, products) {
                 })
 

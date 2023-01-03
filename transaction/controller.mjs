@@ -7,6 +7,7 @@
 //
 // import global from "#root/global";
 // import CONFIG from "#c/config";
+import stringMath from 'string-math';
 
 var self = ({
     buy: function (req, res, next) {
@@ -14,6 +15,7 @@ var self = ({
         let Product = req.mongoose.model('Product');
         let Transaction = req.mongoose.model('Transaction');
         let Gateway = req.mongoose.model('Gateway');
+        let Settings = req.mongoose.model('Settings');
 
         console.log("buy...", req.params._id, req.params._price);
         if (req.params._price && (req.params._price == null || req.params._price == "null"))
@@ -33,7 +35,7 @@ var self = ({
                 }
 
 
-                Order.findById(req.params._id, "sum , orderNumber , amount , discount , customer , _id",
+                Order.findById(req.params._id, "sum , orderNumber , amount , discount , customer",
                     function (err, order) {
                         if (err || !order) {
                             res.json({
@@ -67,11 +69,15 @@ var self = ({
                         //    if we have method, submit method too
                         console.log('order.orderNumber', order.orderNumber)
                         gateway.request = gateway.request.replaceAll("%domain%", process.env.BASE_URL);
+
+
                         gateway.request = gateway.request.replaceAll("%amount%", order.amount);
+
+
                         gateway.request = gateway.request.split("%orderNumber%").join(order.orderNumber);
                         // gateway.request = gateway.request.replace("%orderNumber%", order.orderNumber);
                         gateway.request = gateway.request.replaceAll("%orderId%", order._id);
-                        // console.log('gateway.request', gateway.request);
+                        console.log('gateway.request', gateway.request);
                         if (!JSON.parse(gateway.request))
                             return res.json({
                                 success: false,
@@ -79,14 +85,29 @@ var self = ({
                                 message: "gateway request not found"
                             })
                         // let sendrequest=
-                        console.log('req.params._id',req.params._id)
-                        req.httpRequest(JSON.parse(gateway.request)).then(function (parsedBody) {
+                        var theReq = JSON.parse(gateway.request);
+                        console.log('theReq[\'amount\']', theReq['data'])
+
+                        if (theReq['data'] && theReq['data']['Amount'])
+                            theReq['data']['Amount'] = stringMath(theReq['data']['Amount'].toString())
+
+                        if (theReq['data'] && theReq['data']['amount'])
+                            theReq['data']['amount'] = stringMath(theReq['data']['amount'].toString())
+
+                         if (theReq['body'] && theReq['body']['Amount'])
+                            theReq['body']['Amount'] = stringMath(theReq['body']['Amount'].toString())
+
+                        if (theReq['body'] && theReq['body']['amount'])
+                            theReq['body']['amount'] = stringMath(theReq['body']['amount'].toString())
+                        console.log('gateway.request', theReq)
+
+                        // return;
+                        req.httpRequest(theReq).then(function (parsedBody) {
 
                             let obj = {
                                 "amount": amount,
                                 "method": req.body.method,
-                                "order": order._id,
-                                "orderNumber": order.orderNumber,
+                                "order": req.params._id,
                                 "gatewayResponse": JSON.stringify(parsedBody["data"])
                                 // Authority: parsedBody["trackId"]
                             };
@@ -109,7 +130,7 @@ var self = ({
                                         transaction: transaction._id
                                     }
                                 }, function (order_err, updated_order) {
-                                    console.log('parsedBody',parsedBody);
+                                    console.log('parsedBody', parsedBody);
                                     if (parsedBody['data'] && parsedBody['data']['url']) {
                                         return res.json({
                                             success: true,
@@ -135,7 +156,7 @@ var self = ({
                                 });
                             });
 
-                        }).catch(e => res.json({e, requ: JSON.parse(gateway.request)}))
+                        }).catch(e => res.json({e, requ: theReq}))
 
 
                     }).populate("customer", "_id phoneNumber firstName lastName");

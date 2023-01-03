@@ -12,6 +12,10 @@ export default (mongoose)=>{
             default: "normal"
         },
         image: String,
+        useInFilter: {
+            type: Boolean,
+            default: true
+        },
         data: {},
         values:[],
         // parent:{type: mongoose.Schema.Types.ObjectId, ref: 'Attributes'} //category_id

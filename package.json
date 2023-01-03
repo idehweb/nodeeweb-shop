@@ -1,11 +1,12 @@
 {
   "name": "@nodeeweb/shop",
-  "version": "0.0.30",
+  "version": "0.0.351",
   "type": "module",
   "dependencies": {
     "dotenv": "^16.0.1",
     "lodash": "^4.17.21",
-    "mime": "^3.0.0"
+    "mime": "^3.0.0",
+    "string-math": "^1.2.2"
   },
   "scripts": {
     "start": "node index.mjs"

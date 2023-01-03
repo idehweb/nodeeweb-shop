@@ -42,6 +42,7 @@ export default (mongoose) => {
         billingAddress: {},
         statusArray: [],
         sum: Number,
+        tax: Number,
         discount: Number,
         discountCode: String,
         agentIncome: Number,
