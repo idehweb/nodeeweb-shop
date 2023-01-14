@@ -1,6 +1,6 @@
 {
   "name": "@nodeeweb/shop",
-  "version": "0.0.353",
+  "version": "0.0.354",
   "type": "module",
   "dependencies": {
     "dotenv": "^16.0.1",
@@ -13,6 +13,10 @@
   },
   "scripts": {
     "start": "node index.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/idehweb/nodeeweb-server"
   },
   "main": "index.mjs"
 }

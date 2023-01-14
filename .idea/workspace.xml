@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="49bb18a3-8663-4ba3-b14f-a7999451c504" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/order/controller.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/order/controller.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/order/model.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/order/model.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/order/routes.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/order/routes.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/product/controller.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/product/controller.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
-    </list>
+    <list default="true" id="49bb18a3-8663-4ba3-b14f-a7999451c504" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -54,16 +44,25 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="controller.mjs" pinned="false" current-in-tab="true">
+      <file leaf-file-name="controller.mjs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/product/controller.mjs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="231">
-              <caret line="89" column="31" lean-forward="true" selection-start-line="89" selection-start-column="31" selection-end-line="89" selection-end-column="31" />
+            <state relative-caret-position="204">
+              <caret line="88" column="55" selection-start-line="88" selection-start-column="55" selection-end-line="88" selection-end-column="55" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
                 <element signature="e#5362#6860#0" />
                 <element signature="e#8456#9323#0" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="npm-publish.yml" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.github/workflows/npm-publish.yml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="243">
+              <caret line="9" column="22" lean-forward="true" selection-start-line="9" selection-start-column="22" selection-end-line="9" selection-end-column="22" />
             </state>
           </provider>
         </entry>
@@ -244,37 +243,13 @@
             <path>
               <item name="nodeeweb-shop" type="b2602c69:ProjectViewProjectNode" />
               <item name="nodeeweb-shop" type="462c0819:PsiDirectoryNode" />
-              <item name="attributes" type="462c0819:PsiDirectoryNode" />
+              <item name=".github" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="nodeeweb-shop" type="b2602c69:ProjectViewProjectNode" />
               <item name="nodeeweb-shop" type="462c0819:PsiDirectoryNode" />
-              <item name="discount" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="nodeeweb-shop" type="b2602c69:ProjectViewProjectNode" />
-              <item name="nodeeweb-shop" type="462c0819:PsiDirectoryNode" />
-              <item name="order" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="nodeeweb-shop" type="b2602c69:ProjectViewProjectNode" />
-              <item name="nodeeweb-shop" type="462c0819:PsiDirectoryNode" />
-              <item name="product" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="nodeeweb-shop" type="b2602c69:ProjectViewProjectNode" />
-              <item name="nodeeweb-shop" type="462c0819:PsiDirectoryNode" />
-              <item name="productCategory" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="nodeeweb-shop" type="b2602c69:ProjectViewProjectNode" />
-              <item name="nodeeweb-shop" type="462c0819:PsiDirectoryNode" />
-              <item name="transaction" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="nodeeweb-shop" type="b2602c69:ProjectViewProjectNode" />
-              <item name="nodeeweb-shop" type="462c0819:PsiDirectoryNode" />
-              <item name="transfer" type="462c0819:PsiDirectoryNode" />
+              <item name=".github" type="462c0819:PsiDirectoryNode" />
+              <item name="workflows" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -395,12 +370,12 @@
       <workItem from="1673264509963" duration="582000" />
       <workItem from="1673265640429" duration="652000" />
       <workItem from="1673266328117" duration="6054000" />
-      <workItem from="1673703196594" duration="985000" />
+      <workItem from="1673703196594" duration="1312000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="312352000" />
+    <option name="totallyTimeSpent" value="312679000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
@@ -410,9 +385,9 @@
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="7" visible="true" weight="0.29306722" />
-      <window_info anchor="right" id="Remote Host" order="3" visible="true" weight="0.24542125" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2796093" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="7" visible="true" weight="0.29306722" />
+      <window_info anchor="right" id="Remote Host" order="3" weight="0.24542125" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2796093" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -487,7 +462,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/product.js" />
     <entry file="file://$PROJECT_DIR$/../nodeeweb/main/src/models/product.mjs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="81">
@@ -794,13 +768,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/product/controller.mjs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="231">
-          <caret line="89" column="31" lean-forward="true" selection-start-line="89" selection-start-column="31" selection-end-line="89" selection-end-column="31" />
+        <state relative-caret-position="204">
+          <caret line="88" column="55" selection-start-line="88" selection-start-column="55" selection-end-line="88" selection-end-column="55" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
             <element signature="e#5362#6860#0" />
             <element signature="e#8456#9323#0" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.github/workflows/npm-publish.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="243">
+          <caret line="9" column="22" lean-forward="true" selection-start-line="9" selection-start-column="22" selection-end-line="9" selection-end-column="22" />
         </state>
       </provider>
     </entry>
