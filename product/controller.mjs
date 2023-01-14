@@ -75,10 +75,31 @@ let self = ({
         });
         // console.log('search', search);
         let thef = '';
-        if (req.query.filter) {
-            if (JSON.parse(req.query.filter)) {
-                thef = JSON.parse(req.query.filter);
+        function isStringified(jsonValue) { // use this function to check
+            try {
+                console.log("need to parse");
+                return JSON.parse(jsonValue);
+            } catch (err) {
+                console.log("not need to parse");
+
+                return jsonValue;
             }
+        }
+
+        console.log('req.query.filter',req.query.filter)
+        if (req.query.filter) {
+            const json = isStringified(req.query.filter);
+
+            if (typeof json == "object") {
+                console.log("string is a valid json");
+                thef = JSON.parse(req.query.filter);
+
+            }else{
+                console.log("string is not a valid json")
+            }
+            // if (JSON.parse(req.query.filter)) {
+            //     thef = JSON.parse(req.query.filter);
+            // }
         }
         console.log('thef', thef);
         if (thef && thef != '')

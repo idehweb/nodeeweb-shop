@@ -39,6 +39,7 @@ export default (mongoose) => {
         }],
         deliveryDay: {},
         customer_data: {},
+        data: {},
         billingAddress: {},
         statusArray: [],
         sum: Number,

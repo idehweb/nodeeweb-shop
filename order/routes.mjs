@@ -12,6 +12,18 @@ export default [
         "access": "admin_user,admin_shopManager,customer_user",
         "controller": controller.createByCustomer,
 
+
+    },
+    {
+        "path": "/importFromWordpress",
+        "method": "post",
+        "access": "admin_user,admin_shopManager,customer_all",
+        "controller": controller.importFromWordpress,
+    }, {
+        "path": "/rewriteOrders",
+        "method": "post",
+        "access": "admin_user,admin_shopManager,customer_all",
+        "controller": controller.rewriteOrders,
     },
     {
         "path": "/count",
@@ -21,13 +33,13 @@ export default [
     {
         "path": "/cart",
         "method": "post",
-        "access": "admin_user,admin_shopManager",
+        "access": "admin_user,admin_shopManager,customer_all",
         "controller": controller.createCart,
     },
     {
         "path": "/cart/:id",
         "method": "post",
-        "access": "admin_user,admin_shopManager",
+        "access": "admin_user,admin_shopManager,customer_all",
         "controller": controller.createCart,
     },
     {

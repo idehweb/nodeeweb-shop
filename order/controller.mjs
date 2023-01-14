@@ -1,5 +1,7 @@
 import _ from 'lodash'
 import crypto from 'crypto';
+import moment from 'moment';
+import persianJs from "persianjs";
 
 let self = ({
     all: function (req, res, next) {
@@ -142,6 +144,7 @@ let self = ({
                     'X-Total-Count',
                     count,
                 );
+                console.log('orders.length', orders.length)
                 res.json(orders);
                 return 0;
 
@@ -149,8 +152,9 @@ let self = ({
             });
 
         }).populate('customer', '_id phoneNumber firstName lastName').skip(offset).sort({
-            updatedAt: -1,
+            createdAt: -1,
 
+            updatedAt: -1,
             _id: -1,
 
         }).limit(parseInt(req.params.limit));
@@ -302,20 +306,20 @@ let self = ({
                         console.log('resp', resp);
                         Settings.findOne({}, 'tax', function (err, setting) {
                             let tax = false;
-                            console.log('setting.tax',setting.tax)
+                            console.log('setting.tax', setting.tax)
                             if (setting.tax)
                                 tax = setting.tax;
                             req.body.customer = req.headers.customer_id;
-                            if(req.body.discount){
-                                req.body.amount =req.body.amount - req.body.discount
+                            if (req.body.discount) {
+                                req.body.amount = req.body.amount - req.body.discount
                             }
-                            if(tax){
-                                let taxAmount=parseInt(req.body.sum*0.09);
-                                req.body.amount=taxAmount+req.body.amount;
-                                req.body.tax=taxAmount;
+                            if (tax) {
+                                let taxAmount = parseInt(req.body.sum * 0.09);
+                                req.body.amount = taxAmount + req.body.amount;
+                                req.body.tax = taxAmount;
                                 // req.body.amount=taxAmount+req.body.amount;
                             }
-                            let lastObject={
+                            let lastObject = {
                                 "billingAddress": req.body.billingAddress,
                                 "amount": req.body.amount,
                                 "card": req.body.card,
@@ -331,7 +335,7 @@ let self = ({
                                 "sum": req.body.sum,
                                 "tax": req.body.tax || 0,
                             }
-                            if(tax){
+                            if (tax) {
                                 // lastObject['tax']=tax;
                                 // let taxAmount=parseInt(req.body.sum*0.09);
                                 // req.body.amount=taxAmount+req.body.amount;
@@ -894,7 +898,7 @@ let self = ({
                         history: req.body,
                         order: order._id,
                     };
-                    req.req.global.submitAction(action);
+                    // req.req.global.submitAction(action);
                 }
                 if (!req.headers.customer && !req.headers.token) {
                     let action = {
@@ -903,7 +907,7 @@ let self = ({
                         history: req.body,
                         // order: order._id
                     };
-                    req.req.global.submitAction(action);
+                    // req.req.global.submitAction(action);
                 }
                 res.json(order);
                 return 0;
@@ -913,6 +917,10 @@ let self = ({
             req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
             if (req.body.orderNumber) {
                 obj['orderNumber'] = req.body.orderNumber;
+            }
+            console.log('obj', obj)
+            if (!obj.order_id) {
+                obj.order_id = crypto.randomBytes(64).toString('hex');
             }
             Order.create(obj, function (err, order) {
                 if (err || !order) {
@@ -932,7 +940,7 @@ let self = ({
                         history: req.body,
                         order: order._id,
                     };
-                    req.req.global.submitAction(action);
+                    // req.req.global.submitAction(action);
                 }
                 if (!req.headers.customer && !req.headers.token) {
                     let action = {
@@ -942,7 +950,7 @@ let self = ({
                         history: req.body,
                         // order: order._id
                     };
-                    req.req.global.submitAction(action);
+                    // req.req.global.submitAction(action);
                 }
                 res.json(order);
                 return 0;
@@ -950,5 +958,325 @@ let self = ({
             });
         }
     },
+    sendReq: function (req, theUrl, page) {
+        let url = theUrl;
+        url += '&page=' + page;
+        console.log('theUrl:', url);
+        req.httpRequest({
+            method: "get",
+            url: url,
+        }).then(function (response) {
+            // count++;
+            // let x = count * parseInt(req.query.per_page)
+            let Order = req.mongoose.model('Order');
+
+            response.data.forEach((dat) => {
+                let obj = {};
+                if (dat.total) {
+                    obj['amount'] = dat.total
+                }
+                // if (dat.description) {
+                //     obj['description'] = {
+                //         fa: dat.description
+                //
+                //     }
+                // }
+
+                if (dat.id) {
+                    obj['orderNumber'] = dat.id;
+                }
+                obj['data'] = dat;
+                console.log('created dat id:', dat.id)
+                Order.create(obj, function (err, ord) {
+                    let y = page + 1;
+                    // self.sendReq(req, theUrl, y);
+
+                })
+            });
+            // return res.json(response.data)
+        }).catch(e => {
+            console.log('#page =====>     error')
+
+            let y = page + 1;
+            // self.sendReq(req, theUrl, y);
+        });
+    },
+    importFromWordpress: function (req, res, next) {
+        let url = '';
+        if (req.query.url) {
+            url = req.query.url;
+        }
+        if (req.query.consumer_secret) {
+            url += '?consumer_secret=' + req.query.consumer_secret;
+        }
+        if (req.query.consumer_key) {
+            url += '&consumer_key=' + req.query.consumer_key;
+        }
+
+        if (req.query.per_page) {
+            url += '&per_page=' + 1;
+        }
+        // if (req.query.page) {
+        //     url += '&page=' + req.query.page;
+        // }
+        console.log('importFromWordpress', url);
+        let count = 0;
+        var i = req.query.page;
+        // for (var i = 3101; i < 7000; i++) {
+        // let theUrl = url;
+        // theUrl += '&page=' + i;
+        // console.log('theUrl:', theUrl);
+        // return
+        self.sendReq(req, url, i);
+        // }
+
+
+    },
+    rewriteOrders: function (req, res, next) {
+        console.log('rewriteOrders');
+        let Customer = req.mongoose.model('Customer');
+        let Order = req.mongoose.model('Order');
+        let Media = req.mongoose.model('Media');
+        let Notfound = 0
+        Order.find({}, function (err, orders) {
+            _.forEach(orders, (item, k) => {
+                let obj = {};
+                if (item.data && item.data.date_created) {
+                    // console.log('date_created', item.data.date_created, new Date(item.data.date_created))
+                    obj['createdAt'] = moment(item.data.date_created).format();
+                    obj['created_at'] = moment(item.data.date_created).format();
+                }
+                if (item.data && item.data.date_modified) {
+                    // console.log('date_created', item.data.date_created, new Date(item.data.date_created))
+                    obj['updatedAt'] = moment(item.data.date_modified).format();
+                }
+                if (item.data && item.data.line_items) {
+                    let theCart = [], thePackage = [];
+                    _.forEach(item.data.line_items, (cart_data) => {
+                        theCart.push({
+                            "_id": cart_data.id,
+                            "price": cart_data.price,
+                            "salePrice": null,
+                            "count": cart_data.quantity,
+                            "title": {
+                                "fa": cart_data.name
+                            }
+                        })
+                        thePackage.push({
+                            "product_name": cart_data.name,
+                            "product_id": cart_data.id,
+                            "price": cart_data.price,
+                            "total_price": cart_data.total,
+                            "quantity": cart_data.quantity,
+                            // "_id":  cart_data.id
+                        })
+                    })
+
+                    obj['card'] = theCart;
+                    obj['package'] = thePackage;
+                }
+                // console.log('obj',obj)
+// return
+                // console.log('item.data.date_created',item.data.date_created,moment(item.data.date_created).format())
+                if (item.data && item.data.status) {
+                    obj['status'] = item.data.status
+                    if (item.data.status == 'processing') {
+                        obj['status'] = 'indoing';
+                        obj['paymentStatus'] = 'paid';
+                        obj['paid'] = 'true';
+
+                    }
+                    if (item.data.status == 'completed') {
+                        obj['status'] = 'complete';
+                        obj['paymentStatus'] = 'paid';
+                        obj['paid'] = 'true';
+
+                    }
+                    if (item.data.status == 'pws-ready-to-ship') {
+                        obj['status'] = 'makingready';
+                        obj['paymentStatus'] = 'paid';
+                        obj['paid'] = 'true';
+
+                        // obj['paymentStatus']='paid';
+
+                    }
+                    if (item.data.status == 'pws-packaged') {
+                        obj['status'] = 'makingready';
+                        obj['paymentStatus'] = 'paid';
+                        obj['paid'] = 'true';
+
+                        // obj['paymentStatus']='paid';
+
+                    }
+                    if (item.data.status == 'cancelled') {
+                        obj['status'] = 'cancel';
+                        // obj['paymentStatus']='paid';
+
+                    }
+                    if (item.data.status == 'pending') {
+                        obj['status'] = 'processing';
+                        // obj['paymentStatus']='paid';
+
+                    }
+
+                    if (item.data.status == 'on-hold') {
+                        obj['status'] = 'processing';
+                        // obj['paymentStatus']='paid';
+
+                    }
+                }
+                if (item.data && item.data.total) {
+                    obj['amount'] = item.data.total
+                    obj['total'] = item.data.total
+                    obj['sum'] = item.data.total
+                }
+                if (item.data && item.data.cart_tax) {
+                    obj['tax'] = parseInt(item.data.cart_tax)
+
+
+                }
+                let internationalCode = null, sex = null, birthday = null, monthday = null
+                if (item.data && item.data.meta_data && item.data.meta_data[0]) {
+                    _.forEach(item.data.meta_data, (item) => {
+                        if (item.key == '_billing_national_id') {
+                            internationalCode = item.value;
+                        }
+                        if (item.key == '_billing_sex') {
+                            sex = item.value;
+                        }
+                        if (item.key == 'birthday') {
+                            birthday = item.value;
+                        }
+                        if (item.key == 'monthday') {
+                            monthday = item.value;
+                        }
+                    })
+                }
+
+                if (item.data && item.data.billing && item.data.billing.phone) {
+                    let custObj = {
+                        // 'firstName': item.data.billing.first_name,
+                        // 'lastName': item.data.billing.last_name,
+
+                    };
+                    if (item.data.billing && item.data.billing.email) {
+                        custObj['email'] = item.data.billing.email
+                    }
+                    if (internationalCode) {
+                        custObj['internationalCode'] = internationalCode
+                    }
+                    if (sex) {
+                        custObj['sex'] = sex
+                    }
+                    if (birthday && monthday) {
+                        console.log(monthday + '/' + birthday)
+                        // custObj['birthdate']=sex
+                    }
+                    let phoneNumber = (item.data.billing.phone).slice(-12);
+                    phoneNumber = phoneNumber.replace(/\s/g, "");
+                    // console.log('==> addCustomer() 1.11');
+                    phoneNumber = persianJs(phoneNumber).arabicNumber().toString().trim();
+                    phoneNumber = persianJs(phoneNumber).persianNumber().toString().trim();
+                    phoneNumber = parseInt(phoneNumber).toString();
+
+                    if (phoneNumber.length < 12) {
+                        // console.log('to: ', to.toString(), to.toString().length);
+                        if (phoneNumber.toString().length === 10) {
+                            phoneNumber = "98" + phoneNumber.toString();
+                        }
+                    }
+                    custObj['address'] = [{
+                        "type": "",
+                        "State": item.data.billing.state,
+                        "City": item.data.billing.city,
+                        "StreetAddress": item.data.billing.address_1,
+                        "PostalCode": item.data.billing.postcode
+                    }]
+                    if (phoneNumber.length == 12)
+                        Customer.findOneAndUpdate({phoneNumber: phoneNumber}, custObj, {new: true}, function (err, customer) {
+                            if (!customer) {
+                                Notfound++;
+                                console.log('#' + k + ' customer not found', item.data.billing.phone, phoneNumber);
+                                custObj['firstName'] = item.data.billing.first_name;
+                                custObj['lastName'] = item.data.billing.last_name;
+                                Customer.create({phoneNumber: phoneNumber, ...custObj}, function (err, tcustomer) {
+                                    if (tcustomer) {
+                                        obj['customer'] = tcustomer._id;
+                                        obj['customer_data'] = {
+                                            'firstName': item.data.billing.first_name,
+                                            'lastName': item.data.billing.last_name,
+                                        }
+                                        obj['billingAddress'] = {
+                                            "type": "",
+                                            "State": item.data.billing.state,
+                                            "City": item.data.billing.city,
+                                            "StreetAddress": item.data.billing.address_1,
+                                            "PostalCode": item.data.billing.postcode
+                                        }
+                                        Order.findByIdAndUpdate(item._id, obj, function (err, products) {
+                                            console.log('k', k, moment(item.data.date_created).format(), products.createdAt)
+                                        })
+                                    }
+                                });
+                            }
+                            if (customer) {
+                                obj['customer_data'] = {
+                                    phoneNumber: phoneNumber,
+                                    'firstName': customer.firstName || item.data.billing.first_name,
+                                    'lastName': customer.lastName || item.data.billing.last_name,
+                                    'email': item.data.billing.email,
+                                }
+                                // if(!item.data.billing.last_name){
+                                //     console.log(item.orderNumber+' has not last name')
+                                //     let las=item.data.billing.first_name.split(' ');
+                                //     let fi=las.shift()
+                                //     console.log('las')
+                                //     obj['firstName']=fi;
+                                //     obj['lastName']=las.join(' ', ' ')
+                                // }
+                                obj['customer'] = customer._id;
+
+                                obj['billingAddress'] = {
+                                    "type": "",
+                                    "State": item.data.billing.state,
+                                    "City": item.data.billing.city,
+                                    "StreetAddress": item.data.billing.address_1,
+                                    "PostalCode": item.data.billing.postcode
+                                }
+                                if (!customer.firstName) {
+                                    custObj['firstName'] = item.data.billing.first_name
+                                }
+                                if (!customer.lastName) {
+                                    custObj['lastName'] = item.data.billing.last_name
+                                }
+                                Customer.findByIdAndUpdate(customer._id, custObj, {new: true}, function (err, customer) {
+                                    // console.log('custObj', custObj)
+
+                                });
+                                Order.findByIdAndUpdate(item._id, obj,{new:true}, function (err, orders) {
+                                    // console.log('obj', obj)
+                                    if (err) {
+                                        console.log('err', err)
+                                    }
+                                    console.log('k', k,obj.card.length,orders.card.length,orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
+                                })
+                            }
+                        })
+                } else {
+                    console.log('obj', obj)
+                    // return
+                    Order.findByIdAndUpdate(item._id, obj,{new:true}, function (err, orders) {
+                        if (err) {
+                            console.log('err', err)
+                        }
+                        if (item.data)
+                            console.log('k', k,obj.card.length,orders.card.length,orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
+                    })
+                }
+            })
+        })
+    },
+
+
 });
 export default self;
