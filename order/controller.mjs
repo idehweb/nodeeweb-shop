@@ -304,19 +304,20 @@ let self = ({
                 if (ii == len)
                     req.global.checkSiteStatus().then(function (resp) {
                         console.log('resp', resp);
-                        Settings.findOne({}, 'tax', function (err, setting) {
-                            let tax = false;
-                            console.log('setting.tax', setting.tax)
-                            if (setting.tax)
-                                tax = setting.tax;
+                        Settings.findOne({}, 'tax taxAmount', function (err, setting) {
+                            let tax = setting.tax || false;
+                            let taxAmount = setting.taxAmount || 0;
+                            // console.log('setting.taxAmount', setting.taxAmount)
+                            // if (setting.taxAmount)
+                            //     taxAmount = setting.taxAmount;
                             req.body.customer = req.headers.customer_id;
                             if (req.body.discount) {
                                 req.body.amount = req.body.amount - req.body.discount
                             }
-                            if (tax) {
-                                let taxAmount = parseInt(req.body.sum * 0.09);
-                                req.body.amount = taxAmount + req.body.amount;
-                                req.body.tax = taxAmount;
+                            if (taxAmount) {
+                                let theTaxAmount = parseInt(req.body.sum * (taxAmount/100));
+                                req.body.amount = theTaxAmount + req.body.sum;
+                                req.body.taxAmount = taxAmount;
                                 // req.body.amount=taxAmount+req.body.amount;
                             }
                             let lastObject = {
@@ -333,13 +334,16 @@ let self = ({
                                 "package": req.body.package,
                                 "total": req.body.discount ? (req.body.amount - req.body.discount) : req.body.amount,
                                 "sum": req.body.sum,
-                                "tax": req.body.tax || 0,
+                                "ship": req.body.ship || false,
+                                "shipAmount": req.body.shipAmount || 0,
+                                "tax": setting.tax || false,
+                                "taxAmount": req.body.taxAmount || 0,
                             }
                             if (tax) {
                                 // lastObject['tax']=tax;
                                 // let taxAmount=parseInt(req.body.sum*0.09);
                                 // req.body.amount=taxAmount+req.body.amount;
-                                // req.body.tax=taxAmount;
+                                // req.body.taxAmount=taxAmount;
                                 // req.body.amount=taxAmount+req.body.amount;
                             }
                             if (req.body.order_id) {
@@ -425,6 +429,7 @@ let self = ({
                                     total: req.body.total,
                                     orderNumber: req.body.orderNumber,
                                     sum: req.body.sum,
+                                    ...lastObject
                                 }, function (err, order) {
                                     if (err || !order) {
                                         res.json({
