@@ -320,6 +320,12 @@ let self = ({
                                 req.body.taxAmount = taxAmount;
                                 // req.body.amount=taxAmount+req.body.amount;
                             }
+                            if (req.body.deliveryPrice) {
+                                let deliveryPrice = parseInt(req.body.deliveryPrice);
+                                req.body.amount = deliveryPrice + req.body.amount;
+                                // req.body.taxAmount = taxAmount;
+                                // req.body.amount=taxAmount+req.body.amount;
+                            }
                             let lastObject = {
                                 "billingAddress": req.body.billingAddress,
                                 "amount": req.body.amount,
