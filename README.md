@@ -175,6 +175,9 @@ Nodeeweb is licensed under the GNU GENERAL PUBLIC LICENSE, sponsored and support
 
 ## Changelogs
 
+== 0.0.356
+    add order tax and tax amount
+
 == 0.0.353
     update order from wordpress api
 
