@@ -175,6 +175,9 @@ Nodeeweb is licensed under the GNU GENERAL PUBLIC LICENSE, sponsored and support
 
 ## Changelogs
 
+== 0.0.359 && 60
+    remove bugs of discount
+
 == 0.0.358
     update discount
 

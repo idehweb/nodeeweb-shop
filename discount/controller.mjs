@@ -46,14 +46,17 @@ let self = ({
                         return cus.equals(req.headers._id);
                     });
                     // || discount.customerLimit !== 0
-                    if (isInArray && (!discount.customerLimit)) {
+                    if (isInArray) {
 
                         console.log('found it', req.headers._id)
                         // if (!discount.customerLimit || discount.customerLimit !== 0)
-                        return res.json({
-                            success: false,
-                            message: 'you have used this discount once!'
-                        });
+                        if (discount.customerLimit)
+                            return res.json({
+                                success: false,
+                                message: 'you have used this discount once!'
+                            });
+                        continueDiscount();
+
                     } else {
                         continueDiscount();
                     }

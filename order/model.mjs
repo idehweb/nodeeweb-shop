@@ -46,6 +46,7 @@ export default (mongoose) => {
         tax: Boolean,
         taxAmount: Number,
         discount: Number,
+        discountAmount: Number,
         discountCode: String,
         agentIncome: Number,
         sellerIncome: Number,
