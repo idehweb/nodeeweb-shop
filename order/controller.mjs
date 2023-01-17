@@ -313,7 +313,7 @@ let self = ({
                             req.body.customer = req.headers.customer_id;
 
                             if (taxAmount) {
-                                let theTaxAmount = parseInt(req.body.sum * (taxAmount/100));
+                                let theTaxAmount = parseInt(req.body.sum * (taxAmount / 100));
                                 req.body.amount = theTaxAmount + req.body.sum;
                                 req.body.taxAmount = taxAmount;
                                 // req.body.amount=taxAmount+req.body.amount;
@@ -324,9 +324,6 @@ let self = ({
                                 // req.body.taxAmount = taxAmount;
                                 // req.body.amount=taxAmount+req.body.amount;
                             }
-                            if (req.body.discount) {
-                                req.body.amount = req.body.amount - req.body.discount
-                            }
                             let lastObject = {
                                 "billingAddress": req.body.billingAddress,
                                 "amount": req.body.amount,
@@ -334,6 +331,7 @@ let self = ({
                                 "customer": req.body.customer,
                                 "customer_data": req.body.customer_data,
                                 "discount": req.body.discount,
+                                "discountAmount": req.body.discountAmount,
                                 "discountCode": req.body.discountCode,
                                 "deliveryDay": req.body.deliveryDay,
                                 "deliveryPrice": req.body.deliveryPrice,
@@ -346,121 +344,213 @@ let self = ({
                                 "tax": setting.tax || false,
                                 "taxAmount": req.body.taxAmount || 0,
                             }
-                            if (tax) {
-                                // lastObject['tax']=tax;
-                                // let taxAmount=parseInt(req.body.sum*0.09);
-                                // req.body.amount=taxAmount+req.body.amount;
-                                // req.body.taxAmount=taxAmount;
-                                // req.body.amount=taxAmount+req.body.amount;
-                            }
-                            if (req.body.order_id) {
-                                console.log('create order 1...', req.body.order_id);
 
-                                Order.findOneAndUpdate(
-                                    {order_id: req.body.order_id}, {
-                                        $set: lastObject,
-                                        $push: {
-                                            statusArray: {status: 'processing'},
-                                        },
-                                    }, function (err, order) {
-                                        if (err || !order) {
-                                            console.log('err', err);
-                                            Order.create({
-                                                ...lastObject,
-                                                order_id: req.body.order_id,
-                                                status: 'processing',
-                                                orderNumber: req.body.orderNumber,
-
-                                            }, function (err, order) {
-                                                if (err || !order) {
-                                                    return res.json({
-                                                        err: err,
-                                                        success: false,
-                                                        message: 'error!',
-                                                    });
-                                                }
-                                                if (req.headers.customer && req.headers.token) {
-                                                    let action = {
-                                                        customer: req.headers.customer._id,
-                                                        title: 'create order successfully ' + order._id,
-                                                        data: req.body,
-                                                        history: req.body,
-                                                        order: order._id,
-                                                    };
-                                                    req.global.submitAction(action);
-                                                }
-                                                console.log('creating order successfully:', order);
-                                                return res.json({success: true, order: order});
-
+                            if (req.body.discountCode) {
+                                let Discount = req.mongoose.model('Discount');
+                                Discount.findOne({slug: req.body.discountCode},
+                                    function (err, discount) {
+                                        if (err || !discount) {
+                                            return res.json({
+                                                success: false,
+                                                err: err,
+                                                message: 'did not find any discount!'
                                             });
-                                            // res.json({
-                                            //     // obj: {
-                                            //     //     amount: req.body.amount,
-                                            //     //     // card: req.body.card
-                                            //     // },
-                                            //     hrer:'jhjk',
-                                            //     err: err,
-                                            //     order: order,
-                                            //     success: false,
-                                            //     message: 'error!'
-                                            // });
-                                            // return 0;
-                                        } else {
-                                            // if (req.headers.customer && req.headers.token) {
-                                            //     let action = {
-                                            //         customer: req.headers.customer._id,
-                                            //         title: 'create order successfully ' + order._id,
-                                            //         data: req.body,
-                                            //         history: req.body,
-                                            //         order: order._id
-                                            //     };
-                                            //     req.global.submitAction(action);
-                                            // }
-                                            console.log('creating order successfully:', order);
-                                            return res.json({success: true, order: order});
+
+                                        }
+                                        if (discount.count < 1) {
+                                            return res.json({
+                                                success: false,
+                                                message: 'discount is done!'
+                                            });
+                                        }
+                                        if (!discount.customer) {
+                                            discount.customer = [];
                                         }
 
+                                        if (discount.customer && discount.customer.length > 0) {
+
+                                            var isInArray = discount.customer.some(function (cus) {
+                                                return cus.equals(req.headers._id);
+                                            });
+                                            // || discount.customerLimit !== 0
+                                            if (isInArray) {
+
+                                                console.log('found it', req.headers._id)
+                                                // if (!discount.customerLimit || discount.customerLimit !== 0)
+                                                if (discount.customerLimit)
+                                                    return res.json({
+                                                        success: false,
+                                                        message: 'you have used this discount once!'
+                                                    });
+                                                continueDiscount();
+
+                                            } else {
+                                                continueDiscount();
+                                            }
+
+                                        } else {
+                                            continueDiscount();
+                                        }
+
+                                        function continueDiscount() {
+
+                                            discount.customer.push(req.headers._id);
+                                            console.log('req.body.amount',req.body.amount)
+                                            let theDiscount = 0;
+                                            // return res.json(order);
+                                            if (discount.price) {
+                                                theDiscount = discount.price;
+
+                                            }
+                                            if (discount.percent) {
+                                                let x = (req.body.sum * discount.percent) / 100
+                                                theDiscount = parseInt(x);
+
+                                            }
+                                            if (theDiscount < 0) {
+                                                theDiscount = 0;
+                                            }
+                                            Discount.findOneAndUpdate({slug: req.body.discountCode}, {
+                                                    $set: {
+                                                        count: (discount.count - 1),
+                                                        customer: discount.customer,
+                                                        order: req.body.order_id || null
+
+                                                    }
+                                                },
+                                                function (err, discount) {
+                                                    if (err || !discount) {
+                                                        return res.json({
+                                                            success: false,
+                                                            message: 'could not update discount!'
+                                                        });
+                                                    }
+                                                    lastObject['discountAmount'] = theDiscount;
+                                                    console.log('req.body.amount',req.body.amount)
+                                                    console.log('theDiscount',theDiscount)
+                                                    req.body.amount = req.body.amount - theDiscount;
+                                                    console.log('req.body.amount',req.body.amount)
+                                                    lastObject['amount'] = req.body.amount
+                                                    update_order();
+                                                });
+
+
+                                        }
                                     });
                             } else {
-                                console.log('create order 2... line 240');
-                                Order.create({
-                                    billingAddress: req.body.billingAddress,
-                                    amount: req.body.amount,
-                                    card: req.body.card,
-                                    customer: req.body.customer,
-                                    customer_data: req.body.customer_data,
-                                    deliveryDay: req.body.deliveryDay,
-                                    deliveryPrice: req.body.deliveryPrice,
-                                    order_id: crypto.randomBytes(64).toString('hex'),
-                                    package: req.body.package,
-                                    total: req.body.total,
-                                    orderNumber: req.body.orderNumber,
-                                    sum: req.body.sum,
-                                    ...lastObject
-                                }, function (err, order) {
-                                    if (err || !order) {
-                                        res.json({
-                                            err: err,
-                                            success: false,
-                                            message: 'error!',
-                                        });
-                                        return 0;
-                                    }
-                                    if (req.headers.customer && req.headers.token) {
-                                        let action = {
-                                            customer: req.headers.customer._id,
-                                            title: 'create order successfully ' + order._id,
-                                            data: req.body,
-                                            history: req.body,
-                                            order: order._id,
-                                        };
-                                        req.global.submitAction(action);
-                                    }
-                                    console.log('creating order successfully:', order);
-                                    res.json({success: true, order: order});
-                                    return 0;
+                                update_order();
+                            }
 
-                                });
+                            function update_order() {
+                                if (req.body.order_id) {
+                                    console.log('create order 1...', req.body.order_id);
+
+                                    Order.findOneAndUpdate(
+                                        {order_id: req.body.order_id}, {
+                                            $set: lastObject,
+                                            $push: {
+                                                statusArray: {status: 'processing'},
+                                            },
+                                        }, function (err, order) {
+                                            if (err || !order) {
+                                                console.log('err', err);
+                                                Order.create({
+                                                    ...lastObject,
+                                                    order_id: req.body.order_id,
+                                                    status: 'processing',
+                                                    orderNumber: req.body.orderNumber,
+
+                                                }, function (err, order) {
+                                                    if (err || !order) {
+                                                        return res.json({
+                                                            err: err,
+                                                            success: false,
+                                                            message: 'error!',
+                                                        });
+                                                    }
+                                                    if (req.headers.customer && req.headers.token) {
+                                                        let action = {
+                                                            customer: req.headers.customer._id,
+                                                            title: 'create order successfully ' + order._id,
+                                                            data: req.body,
+                                                            history: req.body,
+                                                            order: order._id,
+                                                        };
+                                                        req.global.submitAction(action);
+                                                    }
+                                                    console.log('creating order successfully:', order);
+                                                    return res.json({success: true, order: order});
+
+                                                });
+                                                // res.json({
+                                                //     // obj: {
+                                                //     //     amount: req.body.amount,
+                                                //     //     // card: req.body.card
+                                                //     // },
+                                                //     hrer:'jhjk',
+                                                //     err: err,
+                                                //     order: order,
+                                                //     success: false,
+                                                //     message: 'error!'
+                                                // });
+                                                // return 0;
+                                            } else {
+                                                // if (req.headers.customer && req.headers.token) {
+                                                //     let action = {
+                                                //         customer: req.headers.customer._id,
+                                                //         title: 'create order successfully ' + order._id,
+                                                //         data: req.body,
+                                                //         history: req.body,
+                                                //         order: order._id
+                                                //     };
+                                                //     req.global.submitAction(action);
+                                                // }
+                                                console.log('creating order successfully:', order);
+                                                return res.json({success: true, order: order});
+                                            }
+
+                                        });
+                                } else {
+                                    console.log('create order 2... line 240');
+                                    Order.create({
+                                        billingAddress: req.body.billingAddress,
+                                        amount: req.body.amount,
+                                        card: req.body.card,
+                                        customer: req.body.customer,
+                                        customer_data: req.body.customer_data,
+                                        deliveryDay: req.body.deliveryDay,
+                                        deliveryPrice: req.body.deliveryPrice,
+                                        order_id: crypto.randomBytes(64).toString('hex'),
+                                        package: req.body.package,
+                                        total: req.body.total,
+                                        orderNumber: req.body.orderNumber,
+                                        sum: req.body.sum,
+                                        ...lastObject
+                                    }, function (err, order) {
+                                        if (err || !order) {
+                                            res.json({
+                                                err: err,
+                                                success: false,
+                                                message: 'error!',
+                                            });
+                                            return 0;
+                                        }
+                                        if (req.headers.customer && req.headers.token) {
+                                            let action = {
+                                                customer: req.headers.customer._id,
+                                                title: 'create order successfully ' + order._id,
+                                                data: req.body,
+                                                history: req.body,
+                                                order: order._id,
+                                            };
+                                            req.global.submitAction(action);
+                                        }
+                                        console.log('creating order successfully:', order);
+                                        res.json({success: true, order: order});
+                                        return 0;
+
+                                    });
+                                }
                             }
                         })
 
@@ -1265,24 +1355,24 @@ let self = ({
                                     // console.log('custObj', custObj)
 
                                 });
-                                Order.findByIdAndUpdate(item._id, obj,{new:true}, function (err, orders) {
+                                Order.findByIdAndUpdate(item._id, obj, {new: true}, function (err, orders) {
                                     // console.log('obj', obj)
                                     if (err) {
                                         console.log('err', err)
                                     }
-                                    console.log('k', k,obj.card.length,orders.card.length,orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
+                                    console.log('k', k, obj.card.length, orders.card.length, orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
                                 })
                             }
                         })
                 } else {
                     console.log('obj', obj)
                     // return
-                    Order.findByIdAndUpdate(item._id, obj,{new:true}, function (err, orders) {
+                    Order.findByIdAndUpdate(item._id, obj, {new: true}, function (err, orders) {
                         if (err) {
                             console.log('err', err)
                         }
                         if (item.data)
-                            console.log('k', k,obj.card.length,orders.card.length,orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
+                            console.log('k', k, obj.card.length, orders.card.length, orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
                     })
                 }
             })

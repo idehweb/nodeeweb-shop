@@ -6,12 +6,7 @@ let self = ({
 
         console.log('...setDiscount()', req.headers._id)
         let obj = {};
-        // if (mongoose.isValidObjectId(req.params.id)) {
-        //     obj["_id"] = req.params.id;
-        // } else {
         obj["slug"] = req.params.id;
-
-        // }
         Discount.findOne(obj,
             function (err, discount) {
                 if (err || !discount) {
@@ -55,16 +50,22 @@ let self = ({
                                 success: false,
                                 message: 'you have used this discount once!'
                             });
-                        continueDiscount();
-
+                        // continueDiscount();
+                        continueNotification();
                     } else {
-                        continueDiscount();
+                        // continueDiscount();
+                        continueNotification();
                     }
 
                 } else {
-                    continueDiscount();
+                    // continueDiscount();
+                    continueNotification();
                 }
 
+                function continueNotification() {
+                    return res.json(discount);
+
+                }
                 function continueDiscount() {
 
                     discount.customer.push(req.headers._id);
