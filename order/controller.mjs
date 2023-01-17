@@ -311,9 +311,7 @@ let self = ({
                             // if (setting.taxAmount)
                             //     taxAmount = setting.taxAmount;
                             req.body.customer = req.headers.customer_id;
-                            if (req.body.discount) {
-                                req.body.amount = req.body.amount - req.body.discount
-                            }
+
                             if (taxAmount) {
                                 let theTaxAmount = parseInt(req.body.sum * (taxAmount/100));
                                 req.body.amount = theTaxAmount + req.body.sum;
@@ -325,6 +323,9 @@ let self = ({
                                 req.body.amount = deliveryPrice + req.body.amount;
                                 // req.body.taxAmount = taxAmount;
                                 // req.body.amount=taxAmount+req.body.amount;
+                            }
+                            if (req.body.discount) {
+                                req.body.amount = req.body.amount - req.body.discount
                             }
                             let lastObject = {
                                 "billingAddress": req.body.billingAddress,

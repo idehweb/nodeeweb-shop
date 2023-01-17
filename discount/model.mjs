@@ -9,6 +9,7 @@ export default (mongoose) => {
         },
         price: Number,
         percent: Number,
+        customerLimit: Number,
         count: Number,
         customer: [{type: mongoose.Schema.Types.ObjectId, ref: "Customer"}],
         excludeProduct: [{type: mongoose.Schema.Types.ObjectId, ref: "Product"}],

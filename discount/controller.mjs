@@ -39,16 +39,17 @@ let self = ({
                 if (!discount.customer) {
                     discount.customer = [];
                 }
+
                 if (discount.customer && discount.customer.length > 0) {
 
                     var isInArray = discount.customer.some(function (cus) {
                         return cus.equals(req.headers._id);
                     });
-
-                    if (isInArray) {
+                    // || discount.customerLimit !== 0
+                    if (isInArray && (!discount.customerLimit)) {
 
                         console.log('found it', req.headers._id)
-
+                        // if (!discount.customerLimit || discount.customerLimit !== 0)
                         return res.json({
                             success: false,
                             message: 'you have used this discount once!'
@@ -72,19 +73,19 @@ let self = ({
                                 err: err
                             });
                         }
-                        let theDiscount=0;
+                        let theDiscount = 0;
                         // return res.json(order);
-                        if(discount.price){
+                        if (discount.price) {
                             theDiscount = discount.price;
 
                         }
-                        if(discount.percent){
-                            let x=(order.amount*100)/discount.percent
+                        if (discount.percent) {
+                            let x = (order.amount * 100) / discount.percent
                             theDiscount = x;
 
                         }
-                        if(theDiscount<0){
-                            theDiscount=0;
+                        if (theDiscount < 0) {
+                            theDiscount = 0;
                         }
                         Discount.findOneAndUpdate(obj, {
                                 $set: {
