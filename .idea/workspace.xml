@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="49bb18a3-8663-4ba3-b14f-a7999451c504" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/discount/controller.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/discount/controller.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/discount/model.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/discount/model.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/order/controller.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/order/controller.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-    </list>
+    <list default="true" id="49bb18a3-8663-4ba3-b14f-a7999451c504" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -40,8 +33,8 @@
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="327">
-                <caret line="178" column="4" selection-start-line="178" selection-start-column="4" selection-end-line="178" selection-end-column="4" />
+              <first_editor relative-caret-position="246">
+                <caret line="175" column="13" lean-forward="true" selection-start-line="175" selection-start-column="13" selection-end-line="175" selection-end-column="13" />
               </first_editor>
               <second_editor />
             </state>
@@ -356,12 +349,12 @@
       <workItem from="1673703196594" duration="2530000" />
       <workItem from="1673781871108" duration="6222000" />
       <workItem from="1673896282077" duration="5442000" />
-      <workItem from="1673944307390" duration="1076000" />
+      <workItem from="1673944307390" duration="1310000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="326637000" />
+    <option name="totallyTimeSpent" value="326871000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
@@ -372,9 +365,9 @@
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="7" visible="true" weight="0.46218488" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="7" visible="true" weight="0.46218488" />
       <window_info anchor="right" id="Remote Host" order="3" weight="0.24542125" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2893773" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2893773" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -758,8 +751,8 @@
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="327">
-            <caret line="178" column="4" selection-start-line="178" selection-start-column="4" selection-end-line="178" selection-end-column="4" />
+          <first_editor relative-caret-position="246">
+            <caret line="175" column="13" lean-forward="true" selection-start-line="175" selection-start-column="13" selection-end-line="175" selection-end-column="13" />
           </first_editor>
           <second_editor />
         </state>
