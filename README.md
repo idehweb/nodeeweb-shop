@@ -175,6 +175,11 @@ Nodeeweb is licensed under the GNU GENERAL PUBLIC LICENSE, sponsored and support
 
 ## Changelogs
 
+== 0.0.362
+    * change transaction model
+    * add auth of transaction from gateway
+    * change `all` function of transactions
+
 == 0.0.359 && 60
     remove bugs of discount
 

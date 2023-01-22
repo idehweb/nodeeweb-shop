@@ -5,6 +5,7 @@ export default [
         "path": "/",
         "method": "get",
         "access": "admin_user,admin_shopManager",
+        "controller": controller.all,
 
     },{
         "path": "/status",
@@ -56,6 +57,8 @@ export default [
         "path": "/:offset/:limit",
         "method": "get",
         "access": "admin_user,admin_shopManager",
+        "controller": controller.all,
+
     },
     {
         "path": "/:id",

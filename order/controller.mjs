@@ -132,6 +132,7 @@ let self = ({
                 res.json([]);
                 return 0;
             }
+            let thelength = orders.length, p = 0;
             // console.log('orders', orders);
             delete search['$or'];
             Order.countDocuments(search, function (err, count) {
@@ -144,9 +145,26 @@ let self = ({
                     'X-Total-Count',
                     count,
                 );
-                console.log('orders.length', orders.length)
-                res.json(orders);
-                return 0;
+                _.forEach(orders, (item, i) => {
+                    console.log('item._id', item._id)
+                    if (item.customer && item.customer._id) {
+                        Order.countDocuments({customer: item.customer._id}, function (err, theOrderCount) {
+                            orders[i].customer.orderCount = theOrderCount;
+                            p++;
+                            if (p == thelength) {
+                                return res.json(orders);
+                                // 0;
+                            }
+                        })
+                    } else {
+                        p++;
+                    }
+                    if (p == thelength) {
+                        return res.json(orders);
+                        // 0;
+                    }
+                })
+                // console.log('orders.length', orders.length)
 
 
             });
@@ -157,7 +175,7 @@ let self = ({
             updatedAt: -1,
             _id: -1,
 
-        }).limit(parseInt(req.params.limit));
+        }).limit(parseInt(req.params.limit)).lean();
     },
 
     createByCustomer: function (req, res, next) {
@@ -184,7 +202,7 @@ let self = ({
                 // history:req.body,
                 // order: order._id
             };
-            req.global.submitAction(action);
+            // req.global.submitAction(action);
         }
         var _ids = [], len = 0, ii = 0;
         if (req.body.card && req.body.card.length)
@@ -199,7 +217,8 @@ let self = ({
             console.log('_id', id, pack.price, pack.salePrice);
             // _ids.push(id);
             // console.log('find _id:', id);
-            Product.findOne({_id: id}, '_id combinations type price salePrice title', function (err, ps) {
+            let tempProducts = [];
+            Product.findOne({_id: id}, '_id combinations type price salePrice title quantity in_stock', function (err, ps) {
                 console.log('found id:', id, 'main_id[1]:', main_id[1], 'ps', ps);
                 ii++;
                 if (ps.combinations) {
@@ -236,7 +255,14 @@ let self = ({
 
                                 }
                             }
+                            if (ps.combinations[inde].quantity) {
+                                ps.combinations[inde].quantity--;
+                            }
+                            if (ps.combinations[inde].quantity==0) {
+                                ps.combinations[inde].in_stock=false;
+                                comb.in_stock = false
 
+                            }
                             if (comb.in_stock == false) {
                                 return res.json({
                                     success: false,
@@ -282,6 +308,13 @@ let self = ({
                             // return 0;
 
                         }
+
+                    if (ps.quantity) {
+                        ps.quantity--;
+                    }
+                    if (ps.quantity == 0) {
+                        ps.in_stock = false;
+                    }
                 }
                 if (ps.in_stock == false) {
                     return res.json({
@@ -299,9 +332,12 @@ let self = ({
 
                 console.log('ii', ii);
                 console.log('len', len);
+
+                tempProducts.push(ps);
                 req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
                 // return;
                 if (ii == len)
+                    console.log('\ntempProducts: ',tempProducts)
                     req.global.checkSiteStatus().then(function (resp) {
                         console.log('resp', resp);
                         Settings.findOne({}, 'tax taxAmount', function (err, setting) {
@@ -343,6 +379,7 @@ let self = ({
                                 "shipAmount": req.body.shipAmount || 0,
                                 "tax": setting.tax || false,
                                 "taxAmount": req.body.taxAmount || 0,
+                                "productsAfterThisOrder":tempProducts
                             }
 
                             if (req.body.discountCode) {
@@ -395,7 +432,7 @@ let self = ({
                                         function continueDiscount() {
 
                                             discount.customer.push(req.headers._id);
-                                            console.log('req.body.amount',req.body.amount)
+                                            console.log('req.body.amount', req.body.amount)
                                             let theDiscount = 0;
                                             // return res.json(order);
                                             if (discount.price) {
@@ -426,10 +463,10 @@ let self = ({
                                                         });
                                                     }
                                                     lastObject['discountAmount'] = theDiscount;
-                                                    console.log('req.body.amount',req.body.amount)
-                                                    console.log('theDiscount',theDiscount)
+                                                    console.log('req.body.amount', req.body.amount)
+                                                    console.log('theDiscount', theDiscount)
                                                     req.body.amount = req.body.amount - theDiscount;
-                                                    console.log('req.body.amount',req.body.amount)
+                                                    console.log('req.body.amount', req.body.amount)
                                                     lastObject['amount'] = req.body.amount
                                                     update_order();
                                                 });
@@ -476,10 +513,11 @@ let self = ({
                                                             history: req.body,
                                                             order: order._id,
                                                         };
-                                                        req.global.submitAction(action);
+                                                        // req.global.submitAction(action);
                                                     }
                                                     console.log('creating order successfully:', order);
-                                                    return res.json({success: true, order: order});
+                                                    change_products_quantities();
+                                                    res.json({success: true, order: order});
 
                                                 });
                                                 // res.json({
@@ -506,7 +544,8 @@ let self = ({
                                                 //     req.global.submitAction(action);
                                                 // }
                                                 console.log('creating order successfully:', order);
-                                                return res.json({success: true, order: order});
+                                                change_products_quantities();
+                                                res.json({success: true, order: order});
                                             }
 
                                         });
@@ -543,14 +582,39 @@ let self = ({
                                                 history: req.body,
                                                 order: order._id,
                                             };
-                                            req.global.submitAction(action);
+                                            // req.global.submitAction(action);
                                         }
                                         console.log('creating order successfully:', order);
+                                        change_products_quantities();
                                         res.json({success: true, order: order});
-                                        return 0;
+                                        // return 0;
 
                                     });
                                 }
+                            }
+
+                            function change_products_quantities() {
+
+
+                                console.log('****** change_products_quantities(())=> ')
+                                // _.forEach(tempProducts, function (tempProduct) {
+                                //     console.log('\ntempProduct',{
+                                //         in_stock:tempProduct.in_stock,
+                                //         quantity:tempProduct.quantity,
+                                //         combinations:tempProduct.combinations,
+                                //     })
+                                //
+                                //     Product.findByIdAndUpdate(tempProduct._id,{
+                                //         $set:{
+                                //             in_stock:tempProduct.in_stock,
+                                //             quantity:tempProduct.quantity,
+                                //             combinations:tempProduct.combinations,
+                                //         }
+                                //     },function(err,resp){
+                                //         console.log('resp',resp._id)
+                                //     })
+                                // })
+
                             }
                         })
 
@@ -588,7 +652,7 @@ let self = ({
                 // history:req.body,
                 // order: order._id
             };
-            req.global.submitAction(action);
+            // req.global.submitAction(action);
         }
         var _ids = [], len = 0, ii = 0;
         if (req.body.card && req.body.card.length)
@@ -763,7 +827,7 @@ let self = ({
                                                 history: req.body,
                                                 order: order._id,
                                             };
-                                            req.global.submitAction(action);
+                                            // req.global.submitAction(action);
                                         }
                                         console.log('creating order successfully:', order);
                                         return res.json({success: true, order: order});
@@ -1233,7 +1297,7 @@ let self = ({
                     obj['sum'] = item.data.total
                 }
                 if (item.data && item.data.cart_tax) {
-                    obj['tax'] = parseInt(item.data.cart_tax)
+                    obj['taxAmount'] = parseInt(item.data.cart_tax)
 
 
                 }
@@ -1360,7 +1424,8 @@ let self = ({
                                     if (err) {
                                         console.log('err', err)
                                     }
-                                    console.log('k', k, obj.card.length, orders.card.length, orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
+                                    if (obj.card)
+                                        console.log('k', k, obj.card.length, orders.card.length, orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
                                 })
                             }
                         })

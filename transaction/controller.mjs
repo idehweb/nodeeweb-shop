@@ -8,8 +8,51 @@
 // import global from "#root/global";
 // import CONFIG from "#c/config";
 import stringMath from 'string-math';
+import _ from "lodash";
 
 var self = ({
+    all: function (req, res, next) {
+        let Transaction = req.mongoose.model('Transaction');
+
+        let offset = 0;
+        if (req.params.offset) {
+            offset = parseInt(req.params.offset);
+        }
+
+        let search = {};
+
+        Transaction.find(search, function (err, transactions) {
+            if (err || !transactions) {
+                console.log('err', err);
+                res.json([]);
+                return 0;
+            }
+            // let thelength = orders.length, p = 0;
+            // console.log('orders', orders);
+            // delete search['$or'];
+            Transaction.countDocuments(search, function (err, count) {
+                console.log('countDocuments', count, err);
+                if (err || !count) {
+                    res.json([]);
+                    return 0;
+                }
+                res.setHeader(
+                    'X-Total-Count',
+                    count,
+                );
+                return res.json(transactions);
+
+
+            });
+
+        }).populate("order", "_id orderNumber").skip(offset).sort({
+            createdAt: -1,
+            updatedAt: -1,
+            _id: -1,
+
+        }).limit(parseInt(req.params.limit));
+    },
+
     buy: function (req, res, next) {
         let Order = req.mongoose.model('Order');
         let Product = req.mongoose.model('Product');
@@ -108,8 +151,8 @@ var self = ({
                                 "amount": amount,
                                 "method": req.body.method,
                                 "order": req.params._id,
-                                "gatewayResponse": JSON.stringify(parsedBody["data"])
-                                // Authority: parsedBody["trackId"]
+                                "gatewayResponse": JSON.stringify(parsedBody["data"]),
+                                "Authority": parsedBody["data"]["trackId"]
                             };
                             if (req.headers && req.headers.customer && req.headers.customer._id) {
                                 obj["customer"] = req.headers.customer._id;
@@ -130,7 +173,7 @@ var self = ({
                                         transaction: transaction._id
                                     }
                                 }, function (order_err, updated_order) {
-                                    console.log('parsedBody', parsedBody);
+                                    console.log('end of buy...');
                                     if (parsedBody['data'] && parsedBody['data']['url']) {
                                         return res.json({
                                             success: true,

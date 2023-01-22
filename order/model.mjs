@@ -42,6 +42,7 @@ export default (mongoose) => {
         data: {},
         billingAddress: {},
         statusArray: [],
+        productsAfterThisOrder: [],
         sum: Number,
         tax: Boolean,
         taxAmount: Number,

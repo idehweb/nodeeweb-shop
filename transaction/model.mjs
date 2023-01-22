@@ -6,7 +6,9 @@ export default (mongoose) => {
         customer: {type: mongoose.Schema.Types.ObjectId, ref: "Customer"}, //customer_id
         Authority: String,
         gatewayResponse: String,
+        gatewayVerifyResponse: String,
         time: Number,
+        cardNumber: String,
         payme_tid: String,
         method: String,
         transaction: Number,
