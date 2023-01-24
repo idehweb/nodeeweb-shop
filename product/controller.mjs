@@ -282,21 +282,23 @@ let self = ({
         Product.find({}, function (err, products) {
             _.forEach(products, (item) => {
                 let obj = {};
-                if (item.price) {
-                    obj['price'] = (item.price /109) * 100
+                if(item['slug']) {
+                    obj['slug'] = item['slug'].replace(/\s+/g, '-').toLowerCase();
+                    // if (item.price) {
+                    //     obj['price'] = (item.price /109) * 100
+                    // }
+                    // if (item.salePrice) {
+                    //     obj['salePrice'] = (item.salePrice/109) * 100
+                    // }
+                    // if (item.data.regular_price) {
+                    //     obj['price'] = item.data.regular_price;
+                    // }
+                    // if (item.data.regular_price) {
+                    //     obj['salePrice'] = item.data.sale_price;
+                    // }
+                    Product.findByIdAndUpdate(item._id, obj, function (err, products) {
+                    })
                 }
-                if (item.salePrice) {
-                    obj['salePrice'] = (item.salePrice/109) * 100
-                }
-                // if (item.data.regular_price) {
-                //     obj['price'] = item.data.regular_price;
-                // }
-                // if (item.data.regular_price) {
-                //     obj['salePrice'] = item.data.sale_price;
-                // }
-                Product.findByIdAndUpdate(item._id, obj, function (err, products) {
-                })
-
             })
         })
     },
