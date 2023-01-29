@@ -315,18 +315,19 @@ let self = ({
                     if (ps.quantity == 0) {
                         ps.in_stock = false;
                     }
-                }
-                if (ps.in_stock == false) {
-                    return res.json({
-                        success: false,
-                        message: 'مغایرت در موجودی!',
-                        'ps.in_stock': ps.in_stock,
-                        'ps.type': ps.type,
-                        'ps.title': ps.title,
+                    if (ps.in_stock == false) {
+                        return res.json({
+                            success: false,
+                            message: 'مغایرت در موجودی!',
+                            'ps.in_stock': ps.in_stock,
+                            'ps.type': ps.type,
+                            'ps.title': ps.title,
 
-                    });
-                    // return 0;
+                        });
+                        // return 0;
+                    }
                 }
+
                 // }
 
 
@@ -1152,6 +1153,15 @@ let self = ({
                     obj['orderNumber'] = dat.id;
                 }
                 obj['data'] = dat;
+                if (dat && dat.date_created) {
+                    // console.log('date_created', dat.date_created, new Date(dat.date_created))
+                    obj['createdAt'] = moment(dat.date_created).format();
+                    obj['created_at'] = moment(dat.date_created).format();
+                }
+                if (dat && dat.date_modified) {
+                    // console.log('date_created', dat.date_created, new Date(dat.date_created))
+                    obj['updatedAt'] = moment(dat.date_modified).format();
+                }
                 console.log('created dat id:', dat.id)
                 Order.create(obj, function (err, ord) {
                     let y = page + 1;

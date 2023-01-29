@@ -20,7 +20,12 @@ var self = ({
         }
 
         let search = {};
-
+if(req.query.order){
+    search['order']=req.query.order
+}
+if(req.query.customer){
+    search['order']=req.query.customer
+}
         Transaction.find(search, function (err, transactions) {
             if (err || !transactions) {
                 console.log('err', err);
