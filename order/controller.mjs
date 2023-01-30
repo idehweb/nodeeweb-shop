@@ -2,6 +2,7 @@ import _ from 'lodash'
 import crypto from 'crypto';
 import moment from 'moment';
 import persianJs from "persianjs";
+import stringMath from "string-math";
 
 let self = ({
     all: function (req, res, next) {
@@ -221,61 +222,63 @@ let self = ({
             Product.findOne({_id: id}, '_id combinations type price salePrice title quantity in_stock', function (err, ps) {
                 console.log('found id:', id, 'main_id[1]:', main_id[1], 'ps', ps);
                 ii++;
-                if (ps.combinations) {
-                    _.forEach(ps.combinations, function (comb, inde) {
-                        if ((inde == main_id[1]) || (comb.id == main_id[1])) {
-                            console.log('find comb', comb);
-                            if (pack.salePrice) {
-                                if (pack.salePrice != comb.salePrice) {
-                                    return res.json({
-                                        success: false,
-                                        message: 'مغایرت در قیمت ها!',
-                                        'pack.salePrice': pack.salePrice,
-                                        'comb.salePrice': comb.salePrice,
-                                        'ps.type': ps.type,
-                                        'ps.title': ps.title,
-                                        'err': 1,
-                                    });
-                                    // return 0;
+                if (ps.type != 'normal') {
+                    if (ps.combinations) {
+                        _.forEach(ps.combinations, function (comb, inde) {
+                            if ((inde == main_id[1]) || (comb.id == main_id[1])) {
+                                console.log('find comb', comb);
+                                if (pack.salePrice) {
+                                    if (pack.salePrice != comb.salePrice) {
+                                        return res.json({
+                                            success: false,
+                                            message: 'مغایرت در قیمت ها!',
+                                            'pack.salePrice': pack.salePrice,
+                                            'comb.salePrice': comb.salePrice,
+                                            'ps.type': ps.type,
+                                            'ps.title': ps.title,
+                                            'err': 1,
+                                        });
+                                        // return 0;
+
+                                    }
+                                } else if (pack.price) {
+                                    if (pack.price != comb.price) {
+                                        return res.json({
+                                            success: false,
+                                            message: 'مغایرت در قیمت ها!',
+                                            'pack.price': pack.price,
+                                            'comb.price': comb.price,
+                                            'ps.type': ps.type,
+                                            'ps.title': ps.title,
+                                            'err': 2,
+
+                                        });
+                                        // return 0;
+
+                                    }
+                                }
+                                if (ps.combinations[inde].quantity) {
+                                    ps.combinations[inde].quantity--;
+                                }
+                                if (ps.combinations[inde].quantity == 0) {
+                                    ps.combinations[inde].in_stock = false;
+                                    comb.in_stock = false
 
                                 }
-                            } else if (pack.price) {
-                                if (pack.price != comb.price) {
+                                if (comb.in_stock == false) {
                                     return res.json({
                                         success: false,
-                                        message: 'مغایرت در قیمت ها!',
-                                        'pack.price': pack.price,
-                                        'comb.price': comb.price,
+                                        message: 'مغایرت در موجودی!',
+                                        'comb.in_stock': comb.in_stock,
                                         'ps.type': ps.type,
                                         'ps.title': ps.title,
-                                        'err': 2,
 
                                     });
                                     // return 0;
-
                                 }
                             }
-                            if (ps.combinations[inde].quantity) {
-                                ps.combinations[inde].quantity--;
-                            }
-                            if (ps.combinations[inde].quantity==0) {
-                                ps.combinations[inde].in_stock=false;
-                                comb.in_stock = false
-
-                            }
-                            if (comb.in_stock == false) {
-                                return res.json({
-                                    success: false,
-                                    message: 'مغایرت در موجودی!',
-                                    'comb.in_stock': comb.in_stock,
-                                    'ps.type': ps.type,
-                                    'ps.title': ps.title,
-
-                                });
-                                // return 0;
-                            }
-                        }
-                    });
+                        });
+                    }
                 }
                 if (ps.type == 'normal') {
                     if (pack.salePrice) {
@@ -338,295 +341,295 @@ let self = ({
                 req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
                 // return;
                 if (ii == len)
-                    console.log('\ntempProducts: ',tempProducts)
-                    req.global.checkSiteStatus().then(function (resp) {
-                        console.log('resp', resp);
-                        Settings.findOne({}, 'tax taxAmount', function (err, setting) {
-                            let tax = setting.tax || false;
-                            let taxAmount = setting.taxAmount || 0;
-                            // console.log('setting.taxAmount', setting.taxAmount)
-                            // if (setting.taxAmount)
-                            //     taxAmount = setting.taxAmount;
-                            req.body.customer = req.headers.customer_id;
+                    console.log('\ntempProducts: ', tempProducts)
+                req.global.checkSiteStatus().then(function (resp) {
+                    console.log('resp', resp);
+                    Settings.findOne({}, 'tax taxAmount', function (err, setting) {
+                        let tax = setting.tax || false;
+                        let taxAmount = setting.taxAmount || 0;
+                        // console.log('setting.taxAmount', setting.taxAmount)
+                        // if (setting.taxAmount)
+                        //     taxAmount = setting.taxAmount;
+                        req.body.customer = req.headers.customer_id;
 
-                            if (taxAmount) {
-                                let theTaxAmount = parseInt(req.body.sum * (taxAmount / 100));
-                                req.body.amount = theTaxAmount + req.body.sum;
-                                req.body.taxAmount = taxAmount;
-                                // req.body.amount=taxAmount+req.body.amount;
-                            }
-                            if (req.body.deliveryPrice) {
-                                let deliveryPrice = parseInt(req.body.deliveryPrice);
-                                req.body.amount = deliveryPrice + req.body.amount;
-                                // req.body.taxAmount = taxAmount;
-                                // req.body.amount=taxAmount+req.body.amount;
-                            }
-                            let lastObject = {
-                                "billingAddress": req.body.billingAddress,
-                                "amount": req.body.amount,
-                                "card": req.body.card,
-                                "customer": req.body.customer,
-                                "customer_data": req.body.customer_data,
-                                "discount": req.body.discount,
-                                "discountAmount": req.body.discountAmount,
-                                "discountCode": req.body.discountCode,
-                                "deliveryDay": req.body.deliveryDay,
-                                "deliveryPrice": req.body.deliveryPrice,
-                                "status": 'processing',
-                                "package": req.body.package,
-                                "total": req.body.discount ? (req.body.amount - req.body.discount) : req.body.amount,
-                                "sum": req.body.sum,
-                                "ship": req.body.ship || false,
-                                "shipAmount": req.body.shipAmount || 0,
-                                "tax": setting.tax || false,
-                                "taxAmount": req.body.taxAmount || 0,
-                                "productsAfterThisOrder":tempProducts
-                            }
+                        if (taxAmount) {
+                            let theTaxAmount = parseInt(req.body.sum * (taxAmount / 100));
+                            req.body.amount = theTaxAmount + req.body.sum;
+                            req.body.taxAmount = taxAmount;
+                            // req.body.amount=taxAmount+req.body.amount;
+                        }
+                        if (req.body.deliveryPrice) {
+                            let deliveryPrice = parseInt(req.body.deliveryPrice);
+                            req.body.amount = deliveryPrice + req.body.amount;
+                            // req.body.taxAmount = taxAmount;
+                            // req.body.amount=taxAmount+req.body.amount;
+                        }
+                        let lastObject = {
+                            "billingAddress": req.body.billingAddress,
+                            "amount": req.body.amount,
+                            "card": req.body.card,
+                            "customer": req.body.customer,
+                            "customer_data": req.body.customer_data,
+                            "discount": req.body.discount,
+                            "discountAmount": req.body.discountAmount,
+                            "discountCode": req.body.discountCode,
+                            "deliveryDay": req.body.deliveryDay,
+                            "deliveryPrice": req.body.deliveryPrice,
+                            "status": 'processing',
+                            "package": req.body.package,
+                            "total": req.body.discount ? (req.body.amount - req.body.discount) : req.body.amount,
+                            "sum": req.body.sum,
+                            "ship": req.body.ship || false,
+                            "shipAmount": req.body.shipAmount || 0,
+                            "tax": setting.tax || false,
+                            "taxAmount": req.body.taxAmount || 0,
+                            "productsAfterThisOrder": tempProducts
+                        }
 
-                            if (req.body.discountCode) {
-                                let Discount = req.mongoose.model('Discount');
-                                Discount.findOne({slug: req.body.discountCode},
-                                    function (err, discount) {
-                                        if (err || !discount) {
-                                            return res.json({
-                                                success: false,
-                                                err: err,
-                                                message: 'did not find any discount!'
-                                            });
+                        if (req.body.discountCode) {
+                            let Discount = req.mongoose.model('Discount');
+                            Discount.findOne({slug: req.body.discountCode},
+                                function (err, discount) {
+                                    if (err || !discount) {
+                                        return res.json({
+                                            success: false,
+                                            err: err,
+                                            message: 'did not find any discount!'
+                                        });
 
-                                        }
-                                        if (discount.count < 1) {
-                                            return res.json({
-                                                success: false,
-                                                message: 'discount is done!'
-                                            });
-                                        }
-                                        if (!discount.customer) {
-                                            discount.customer = [];
-                                        }
+                                    }
+                                    if (discount.count < 1) {
+                                        return res.json({
+                                            success: false,
+                                            message: 'discount is done!'
+                                        });
+                                    }
+                                    if (!discount.customer) {
+                                        discount.customer = [];
+                                    }
 
-                                        if (discount.customer && discount.customer.length > 0) {
+                                    if (discount.customer && discount.customer.length > 0) {
 
-                                            var isInArray = discount.customer.some(function (cus) {
-                                                return cus.equals(req.headers._id);
-                                            });
-                                            // || discount.customerLimit !== 0
-                                            if (isInArray) {
+                                        var isInArray = discount.customer.some(function (cus) {
+                                            return cus.equals(req.headers._id);
+                                        });
+                                        // || discount.customerLimit !== 0
+                                        if (isInArray) {
 
-                                                console.log('found it', req.headers._id)
-                                                // if (!discount.customerLimit || discount.customerLimit !== 0)
-                                                if (discount.customerLimit)
-                                                    return res.json({
-                                                        success: false,
-                                                        message: 'you have used this discount once!'
-                                                    });
-                                                continueDiscount();
-
-                                            } else {
-                                                continueDiscount();
-                                            }
+                                            console.log('found it', req.headers._id)
+                                            // if (!discount.customerLimit || discount.customerLimit !== 0)
+                                            if (discount.customerLimit)
+                                                return res.json({
+                                                    success: false,
+                                                    message: 'you have used this discount once!'
+                                                });
+                                            continueDiscount();
 
                                         } else {
                                             continueDiscount();
                                         }
 
-                                        function continueDiscount() {
+                                    } else {
+                                        continueDiscount();
+                                    }
 
-                                            discount.customer.push(req.headers._id);
-                                            console.log('req.body.amount', req.body.amount)
-                                            let theDiscount = 0;
-                                            // return res.json(order);
-                                            if (discount.price) {
-                                                theDiscount = discount.price;
+                                    function continueDiscount() {
 
-                                            }
-                                            if (discount.percent) {
-                                                let x = (req.body.sum * discount.percent) / 100
-                                                theDiscount = parseInt(x);
-
-                                            }
-                                            if (theDiscount < 0) {
-                                                theDiscount = 0;
-                                            }
-                                            Discount.findOneAndUpdate({slug: req.body.discountCode}, {
-                                                    $set: {
-                                                        count: (discount.count - 1),
-                                                        customer: discount.customer,
-                                                        order: req.body.order_id || null
-
-                                                    }
-                                                },
-                                                function (err, discount) {
-                                                    if (err || !discount) {
-                                                        return res.json({
-                                                            success: false,
-                                                            message: 'could not update discount!'
-                                                        });
-                                                    }
-                                                    lastObject['discountAmount'] = theDiscount;
-                                                    console.log('req.body.amount', req.body.amount)
-                                                    console.log('theDiscount', theDiscount)
-                                                    req.body.amount = req.body.amount - theDiscount;
-                                                    console.log('req.body.amount', req.body.amount)
-                                                    lastObject['amount'] = req.body.amount
-                                                    update_order();
-                                                });
-
+                                        discount.customer.push(req.headers._id);
+                                        console.log('req.body.amount', req.body.amount)
+                                        let theDiscount = 0;
+                                        // return res.json(order);
+                                        if (discount.price) {
+                                            theDiscount = discount.price;
 
                                         }
-                                    });
-                            } else {
-                                update_order();
-                            }
+                                        if (discount.percent) {
+                                            let x = (req.body.sum * discount.percent) / 100
+                                            theDiscount = parseInt(x);
 
-                            function update_order() {
-                                if (req.body.order_id) {
-                                    console.log('create order 1...', req.body.order_id);
+                                        }
+                                        if (theDiscount < 0) {
+                                            theDiscount = 0;
+                                        }
+                                        Discount.findOneAndUpdate({slug: req.body.discountCode}, {
+                                                $set: {
+                                                    count: (discount.count - 1),
+                                                    customer: discount.customer,
+                                                    order: req.body.order_id || null
 
-                                    Order.findOneAndUpdate(
-                                        {order_id: req.body.order_id}, {
-                                            $set: lastObject,
-                                            $push: {
-                                                statusArray: {status: 'processing'},
+                                                }
                                             },
-                                        }, function (err, order) {
-                                            if (err || !order) {
-                                                console.log('err', err);
-                                                Order.create({
-                                                    ...lastObject,
-                                                    order_id: req.body.order_id,
-                                                    status: 'processing',
-                                                    orderNumber: req.body.orderNumber,
+                                            function (err, discount) {
+                                                if (err || !discount) {
+                                                    return res.json({
+                                                        success: false,
+                                                        message: 'could not update discount!'
+                                                    });
+                                                }
+                                                lastObject['discountAmount'] = theDiscount;
+                                                console.log('req.body.amount', req.body.amount)
+                                                console.log('theDiscount', theDiscount)
+                                                req.body.amount = req.body.amount - theDiscount;
+                                                console.log('req.body.amount', req.body.amount)
+                                                lastObject['amount'] = req.body.amount
+                                                update_order();
+                                            });
 
-                                                }, function (err, order) {
-                                                    if (err || !order) {
-                                                        return res.json({
-                                                            err: err,
-                                                            success: false,
-                                                            message: 'error!',
-                                                        });
-                                                    }
-                                                    if (req.headers.customer && req.headers.token) {
-                                                        let action = {
-                                                            customer: req.headers.customer._id,
-                                                            title: 'create order successfully ' + order._id,
-                                                            data: req.body,
-                                                            history: req.body,
-                                                            order: order._id,
-                                                        };
-                                                        // req.global.submitAction(action);
-                                                    }
-                                                    console.log('creating order successfully:', order);
-                                                    change_products_quantities();
-                                                    res.json({success: true, order: order});
 
-                                                });
-                                                // res.json({
-                                                //     // obj: {
-                                                //     //     amount: req.body.amount,
-                                                //     //     // card: req.body.card
-                                                //     // },
-                                                //     hrer:'jhjk',
-                                                //     err: err,
-                                                //     order: order,
-                                                //     success: false,
-                                                //     message: 'error!'
-                                                // });
-                                                // return 0;
-                                            } else {
-                                                // if (req.headers.customer && req.headers.token) {
-                                                //     let action = {
-                                                //         customer: req.headers.customer._id,
-                                                //         title: 'create order successfully ' + order._id,
-                                                //         data: req.body,
-                                                //         history: req.body,
-                                                //         order: order._id
-                                                //     };
-                                                //     req.global.submitAction(action);
-                                                // }
+                                    }
+                                });
+                        } else {
+                            update_order();
+                        }
+
+                        function update_order() {
+                            if (req.body.order_id) {
+                                console.log('create order 1...', req.body.order_id);
+
+                                Order.findOneAndUpdate(
+                                    {order_id: req.body.order_id}, {
+                                        $set: lastObject,
+                                        $push: {
+                                            statusArray: {status: 'processing'},
+                                        },
+                                    }, function (err, order) {
+                                        if (err || !order) {
+                                            console.log('err', err);
+                                            Order.create({
+                                                ...lastObject,
+                                                order_id: req.body.order_id,
+                                                status: 'processing',
+                                                orderNumber: req.body.orderNumber,
+
+                                            }, function (err, order) {
+                                                if (err || !order) {
+                                                    return res.json({
+                                                        err: err,
+                                                        success: false,
+                                                        message: 'error!',
+                                                    });
+                                                }
+                                                if (req.headers.customer && req.headers.token) {
+                                                    let action = {
+                                                        customer: req.headers.customer._id,
+                                                        title: 'create order successfully ' + order._id,
+                                                        data: req.body,
+                                                        history: req.body,
+                                                        order: order._id,
+                                                    };
+                                                    // req.global.submitAction(action);
+                                                }
                                                 console.log('creating order successfully:', order);
                                                 change_products_quantities();
                                                 res.json({success: true, order: order});
-                                            }
 
-                                        });
-                                } else {
-                                    console.log('create order 2... line 240');
-                                    Order.create({
-                                        billingAddress: req.body.billingAddress,
-                                        amount: req.body.amount,
-                                        card: req.body.card,
-                                        customer: req.body.customer,
-                                        customer_data: req.body.customer_data,
-                                        deliveryDay: req.body.deliveryDay,
-                                        deliveryPrice: req.body.deliveryPrice,
-                                        order_id: crypto.randomBytes(64).toString('hex'),
-                                        package: req.body.package,
-                                        total: req.body.total,
-                                        orderNumber: req.body.orderNumber,
-                                        sum: req.body.sum,
-                                        ...lastObject
-                                    }, function (err, order) {
-                                        if (err || !order) {
-                                            res.json({
-                                                err: err,
-                                                success: false,
-                                                message: 'error!',
                                             });
-                                            return 0;
+                                            // res.json({
+                                            //     // obj: {
+                                            //     //     amount: req.body.amount,
+                                            //     //     // card: req.body.card
+                                            //     // },
+                                            //     hrer:'jhjk',
+                                            //     err: err,
+                                            //     order: order,
+                                            //     success: false,
+                                            //     message: 'error!'
+                                            // });
+                                            // return 0;
+                                        } else {
+                                            // if (req.headers.customer && req.headers.token) {
+                                            //     let action = {
+                                            //         customer: req.headers.customer._id,
+                                            //         title: 'create order successfully ' + order._id,
+                                            //         data: req.body,
+                                            //         history: req.body,
+                                            //         order: order._id
+                                            //     };
+                                            //     req.global.submitAction(action);
+                                            // }
+                                            console.log('creating order successfully:', order);
+                                            change_products_quantities();
+                                            res.json({success: true, order: order});
                                         }
-                                        if (req.headers.customer && req.headers.token) {
-                                            let action = {
-                                                customer: req.headers.customer._id,
-                                                title: 'create order successfully ' + order._id,
-                                                data: req.body,
-                                                history: req.body,
-                                                order: order._id,
-                                            };
-                                            // req.global.submitAction(action);
-                                        }
-                                        console.log('creating order successfully:', order);
-                                        change_products_quantities();
-                                        res.json({success: true, order: order});
-                                        // return 0;
 
                                     });
-                                }
+                            } else {
+                                console.log('create order 2... line 240');
+                                Order.create({
+                                    billingAddress: req.body.billingAddress,
+                                    amount: req.body.amount,
+                                    card: req.body.card,
+                                    customer: req.body.customer,
+                                    customer_data: req.body.customer_data,
+                                    deliveryDay: req.body.deliveryDay,
+                                    deliveryPrice: req.body.deliveryPrice,
+                                    order_id: crypto.randomBytes(64).toString('hex'),
+                                    package: req.body.package,
+                                    total: req.body.total,
+                                    orderNumber: req.body.orderNumber,
+                                    sum: req.body.sum,
+                                    ...lastObject
+                                }, function (err, order) {
+                                    if (err || !order) {
+                                        res.json({
+                                            err: err,
+                                            success: false,
+                                            message: 'error!',
+                                        });
+                                        return 0;
+                                    }
+                                    if (req.headers.customer && req.headers.token) {
+                                        let action = {
+                                            customer: req.headers.customer._id,
+                                            title: 'create order successfully ' + order._id,
+                                            data: req.body,
+                                            history: req.body,
+                                            order: order._id,
+                                        };
+                                        // req.global.submitAction(action);
+                                    }
+                                    console.log('creating order successfully:', order);
+                                    change_products_quantities();
+                                    res.json({success: true, order: order});
+                                    // return 0;
+
+                                });
                             }
+                        }
 
-                            function change_products_quantities() {
-
-
-                                console.log('****** change_products_quantities(())=> ')
-                                // _.forEach(tempProducts, function (tempProduct) {
-                                //     console.log('\ntempProduct',{
-                                //         in_stock:tempProduct.in_stock,
-                                //         quantity:tempProduct.quantity,
-                                //         combinations:tempProduct.combinations,
-                                //     })
-                                //
-                                //     Product.findByIdAndUpdate(tempProduct._id,{
-                                //         $set:{
-                                //             in_stock:tempProduct.in_stock,
-                                //             quantity:tempProduct.quantity,
-                                //             combinations:tempProduct.combinations,
-                                //         }
-                                //     },function(err,resp){
-                                //         console.log('resp',resp._id)
-                                //     })
-                                // })
-
-                            }
-                        })
+                        function change_products_quantities() {
 
 
-                    }).catch(function (err2) {
-                        res.json({
-                            success: false,
-                            message: 'site is deactive!',
-                        });
-                        return 0;
+                            console.log('****** change_products_quantities(())=> ')
+                            // _.forEach(tempProducts, function (tempProduct) {
+                            //     console.log('\ntempProduct',{
+                            //         in_stock:tempProduct.in_stock,
+                            //         quantity:tempProduct.quantity,
+                            //         combinations:tempProduct.combinations,
+                            //     })
+                            //
+                            //     Product.findByIdAndUpdate(tempProduct._id,{
+                            //         $set:{
+                            //             in_stock:tempProduct.in_stock,
+                            //             quantity:tempProduct.quantity,
+                            //             combinations:tempProduct.combinations,
+                            //         }
+                            //     },function(err,resp){
+                            //         console.log('resp',resp._id)
+                            //     })
+                            // })
+
+                        }
+                    })
+
+
+                }).catch(function (err2) {
+                    res.json({
+                        success: false,
+                        message: 'site is deactive!',
                     });
+                    return 0;
+                });
             });
         });
     },
@@ -989,6 +992,177 @@ let self = ({
 
             });
         }
+    }
+    ,
+    createPaymentLink: function (req, res, next) {
+        console.log('creating transaction by admin...');
+        // req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
+
+        let Order = req.mongoose.model('Order');
+        let Product = req.mongoose.model('Product');
+        let Transaction = req.mongoose.model('Transaction');
+        let Gateway = req.mongoose.model('Gateway');
+        let Settings = req.mongoose.model('Settings');
+
+        console.log("buy...", req.params._id, req.body.amount);
+        if (req.body.amount && (req.body.amount == null || req.body.amount == "null"))
+            return res.json({
+                success: false,
+                message: "req.body.amount"
+            });
+        if (req.body.method)
+            Gateway.findOne({slug: req.body.method}, function (err, gateway) {
+                if (!gateway || !gateway.request) {
+                    return res.json({
+                        success: false,
+                        slug: req.body.method,
+                        // gateway: gateway,
+                        message: "gateway request not found"
+                    })
+                }
+                req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
+
+                let obj = {
+                    order_id: crypto.randomBytes(64).toString('hex'),
+                    amount: req.body.amount ? req.body.amount : amount,
+                    total: req.body.amount ? req.body.amount : amount,
+                    orderNumber: req.body.orderNumber,
+                    sum: req.body.amount ? req.body.amount : amount,
+                    status: req.body.status || 'checkout'
+                }
+                Order.create(obj,
+                    function (err, order) {
+                        if (err || !order) {
+                            res.json({
+                                success: false,
+                                message: "error!"
+                            });
+                            return 0;
+                        }
+
+                        // obj[]=;
+// console.log(order.amount/);
+//                 return;
+                        let amount = parseInt(order.amount) * 10;
+                        if (req.body.amount) {
+                            amount = parseInt(req.body.amount) * 10;
+                        }
+                        if (order.discount) {
+                            amount = amount - (order.discount * 10);
+                        }
+                        if (amount < 0) {
+                            amount = 0;
+                        }
+                        if (amount > 500000000) {
+                            return res.json({
+                                success: false,
+                                message: "price is more than 50,000,000T"
+                            });
+                        }
+                        //check if we have method or not,
+                        // for both we have to create transaction
+                        //    if we have method, submit method too
+                        console.log('order.orderNumber', order.orderNumber)
+                        gateway.request = gateway.request.replaceAll("%domain%", process.env.BASE_URL);
+
+
+                        gateway.request = gateway.request.replaceAll("%amount%", order.amount);
+
+
+                        gateway.request = gateway.request.split("%orderNumber%").join(order.orderNumber);
+                        // gateway.request = gateway.request.replace("%orderNumber%", order.orderNumber);
+                        gateway.request = gateway.request.replaceAll("%orderId%", order._id);
+                        console.log('gateway.request', gateway.request);
+                        if (!JSON.parse(gateway.request))
+                            return res.json({
+                                success: false,
+                                gateway: JSON.parse(gateway.request),
+                                message: "gateway request not found"
+                            })
+                        // let sendrequest=
+                        var theReq = JSON.parse(gateway.request);
+                        console.log('theReq[\'amount\']', theReq['data'])
+
+                        if (theReq['data'] && theReq['data']['Amount'])
+                            theReq['data']['Amount'] = stringMath(theReq['data']['Amount'].toString())
+
+                        if (theReq['data'] && theReq['data']['amount'])
+                            theReq['data']['amount'] = stringMath(theReq['data']['amount'].toString())
+
+                        if (theReq['body'] && theReq['body']['Amount'])
+                            theReq['body']['Amount'] = stringMath(theReq['body']['Amount'].toString())
+
+                        if (theReq['body'] && theReq['body']['amount'])
+                            theReq['body']['amount'] = stringMath(theReq['body']['amount'].toString())
+                        console.log('gateway.request', theReq)
+
+                        // return;
+                        req.httpRequest(theReq).then(function (parsedBody) {
+
+                            let obj = {
+                                "amount": amount,
+                                "method": req.body.method,
+                                "order": req.params._id,
+                                "gatewayResponse": JSON.stringify(parsedBody["data"]),
+                                "Authority": parsedBody["data"]["trackId"]
+                            };
+                            if (req.headers && req.headers.customer && req.headers.customer._id) {
+                                obj["customer"] = req.headers.customer._id;
+                            }
+                            // return res.json({
+                            //     ...obj, gateway: JSON.parse(gateway.request),
+                            // });
+                            Transaction.create(obj, function (err, transaction) {
+                                if (err || !transaction) {
+                                    return res.json({
+                                        success: false,
+                                        message: "transaction could not be created",
+                                        err: err
+                                    })
+                                }
+                                Order.findByIdAndUpdate(req.params._id, {
+                                    $push: {
+                                        transaction: transaction._id
+                                    }
+                                }, function (order_err, updated_order) {
+                                    console.log('end of buy...');
+                                    if (parsedBody['data'] && parsedBody['data']['url']) {
+                                        return res.json({
+                                            success: true,
+                                            url: parsedBody['data']['url']
+                                        });
+                                    }
+                                    if (parsedBody['data'] && parsedBody['data'].trackId) {
+
+                                        return res.json({
+                                            success: true,
+                                            // data: parsedBody['data'],
+                                            // request: JSON.parse(gateway.request),
+                                            url: "https://gateway.zibal.ir/start/" + parsedBody['data'].trackId
+                                        });
+                                    } else {
+                                        return res.json({
+                                            success: false,
+                                            // data: parsedBody['data'],
+                                            // request: JSON.parse(gateway.request),
+                                            parsedBody: parsedBody['data']
+                                        });
+                                    }
+                                });
+                            });
+
+                        }).catch(e => res.json({e, requ: theReq}))
+
+
+                    });
+            })
+        else {
+            return res.json({
+                success: false,
+                message: "you have no gateway"
+            })
+        }
+
     }
     ,
     createCart: function (req, res, next) {

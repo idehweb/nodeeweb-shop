@@ -8,7 +8,7 @@
 // import global from "#root/global";
 // import CONFIG from "#c/config";
 import stringMath from 'string-math';
-import _ from "lodash";
+import crypto from 'crypto';
 
 var self = ({
     all: function (req, res, next) {
@@ -20,12 +20,12 @@ var self = ({
         }
 
         let search = {};
-if(req.query.order){
-    search['order']=req.query.order
-}
-if(req.query.customer){
-    search['order']=req.query.customer
-}
+        if (req.query.order) {
+            search['order'] = req.query.order
+        }
+        if (req.query.customer) {
+            search['order'] = req.query.customer
+        }
         Transaction.find(search, function (err, transactions) {
             if (err || !transactions) {
                 console.log('err', err);
@@ -73,7 +73,7 @@ if(req.query.customer){
             });
         if (req.body.method)
             Gateway.findOne({slug: req.body.method}, function (err, gateway) {
-                if (!gateway.request) {
+                if (!gateway || !gateway.request) {
                     return res.json({
                         success: false,
                         slug: req.body.method,
@@ -142,7 +142,7 @@ if(req.query.customer){
                         if (theReq['data'] && theReq['data']['amount'])
                             theReq['data']['amount'] = stringMath(theReq['data']['amount'].toString())
 
-                         if (theReq['body'] && theReq['body']['Amount'])
+                        if (theReq['body'] && theReq['body']['Amount'])
                             theReq['body']['Amount'] = stringMath(theReq['body']['Amount'].toString())
 
                         if (theReq['body'] && theReq['body']['amount'])
@@ -220,7 +220,177 @@ if(req.query.customer){
 
         // }).catch(e => res.json(e))
     },
+    create: function (req, res, next) {
+        console.log('creating transaction by admin...');
+        // req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
 
+        let Order = req.mongoose.model('Order');
+        let Product = req.mongoose.model('Product');
+        let Transaction = req.mongoose.model('Transaction');
+        let Gateway = req.mongoose.model('Gateway');
+        let Settings = req.mongoose.model('Settings');
+
+        console.log("buy...", req.params._id, req.body.amount);
+        if (req.body.amount && (req.body.amount == null || req.body.amount == "null"))
+            return res.json({
+                success: false,
+                message: "req.body.amount"
+            });
+        if (req.body.method)
+            Gateway.findOne({slug: req.body.method}, function (err, gateway) {
+                if (!gateway || !gateway.request) {
+                    return res.json({
+                        success: false,
+                        slug: req.body.method,
+                        // gateway: gateway,
+                        message: "gateway request not found"
+                    })
+                }
+                req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
+
+                let obj = {
+                    order_id: crypto.randomBytes(64).toString('hex'),
+                    amount: req.body.amount ? req.body.amount : amount,
+                    total: req.body.amount ? req.body.amount : amount,
+                    orderNumber: req.body.orderNumber,
+                    sum: req.body.amount ? req.body.amount : amount,
+                    status: req.body.status || 'checkout'
+                }
+                Order.create(obj,
+                    function (err, order) {
+                        if (err || !order) {
+                            res.json({
+                                success: false,
+                                message: "error!"
+                            });
+                            return 0;
+                        }
+
+                        // obj[]=;
+// console.log(order.amount/);
+//                 return;
+                        let amount = parseInt(order.amount) * 10;
+                        if (req.body.amount) {
+                            amount = parseInt(req.body.amount) * 10;
+                        }
+                        if (order.discount) {
+                            amount = amount - (order.discount * 10);
+                        }
+                        if (amount < 0) {
+                            amount = 0;
+                        }
+                        if (amount > 500000000) {
+                            return res.json({
+                                success: false,
+                                message: "price is more than 50,000,000T"
+                            });
+                        }
+                        //check if we have method or not,
+                        // for both we have to create transaction
+                        //    if we have method, submit method too
+                        console.log('order.orderNumber', order.orderNumber)
+                        gateway.request = gateway.request.replaceAll("%domain%", process.env.BASE_URL);
+
+
+                        gateway.request = gateway.request.replaceAll("%amount%", order.amount);
+
+
+                        gateway.request = gateway.request.split("%orderNumber%").join(order.orderNumber);
+                        // gateway.request = gateway.request.replace("%orderNumber%", order.orderNumber);
+                        gateway.request = gateway.request.replaceAll("%orderId%", order._id);
+                        console.log('gateway.request', gateway.request);
+                        if (!JSON.parse(gateway.request))
+                            return res.json({
+                                success: false,
+                                gateway: JSON.parse(gateway.request),
+                                message: "gateway request not found"
+                            })
+                        // let sendrequest=
+                        var theReq = JSON.parse(gateway.request);
+                        console.log('theReq[\'amount\']', theReq['data'])
+
+                        if (theReq['data'] && theReq['data']['Amount'])
+                            theReq['data']['Amount'] = stringMath(theReq['data']['Amount'].toString())
+
+                        if (theReq['data'] && theReq['data']['amount'])
+                            theReq['data']['amount'] = stringMath(theReq['data']['amount'].toString())
+
+                        if (theReq['body'] && theReq['body']['Amount'])
+                            theReq['body']['Amount'] = stringMath(theReq['body']['Amount'].toString())
+
+                        if (theReq['body'] && theReq['body']['amount'])
+                            theReq['body']['amount'] = stringMath(theReq['body']['amount'].toString())
+                        console.log('gateway.request', theReq)
+
+                        // return;
+                        req.httpRequest(theReq).then(function (parsedBody) {
+
+                            let obj = {
+                                "amount": amount,
+                                "method": req.body.method,
+                                "order": order._id,
+                                "gatewayResponse": JSON.stringify(parsedBody["data"]),
+                                "Authority": parsedBody["data"]["trackId"]
+                            };
+                            if (req.headers && req.headers.customer && req.headers.customer._id) {
+                                obj["customer"] = req.headers.customer._id;
+                            }
+                            // return res.json({
+                            //     ...obj, gateway: JSON.parse(gateway.request),
+                            // });
+                            Transaction.create(obj, function (err, transaction) {
+                                if (err || !transaction) {
+                                    return res.json({
+                                        success: false,
+                                        message: "transaction could not be created",
+                                        err: err
+                                    })
+                                }
+                                Order.findByIdAndUpdate(req.params._id, {
+                                    $push: {
+                                        transaction: transaction._id
+                                    }
+                                }, function (order_err, updated_order) {
+                                    console.log('end of buy...');
+                                    if (parsedBody['data'] && parsedBody['data']['url']) {
+                                        return res.json({
+                                            success: true,
+                                            url: parsedBody['data']['url']
+                                        });
+                                    }
+                                    if (parsedBody['data'] && parsedBody['data'].trackId) {
+
+                                        return res.json({
+                                            success: true,
+                                            // data: parsedBody['data'],
+                                            // request: JSON.parse(gateway.request),
+                                            url: "https://gateway.zibal.ir/start/" + parsedBody['data'].trackId
+                                        });
+                                    } else {
+                                        return res.json({
+                                            success: false,
+                                            // data: parsedBody['data'],
+                                            // request: JSON.parse(gateway.request),
+                                            parsedBody: parsedBody['data']
+                                        });
+                                    }
+                                });
+                            });
+
+                        }).catch(e => res.json({e, requ: theReq}))
+
+
+                    });
+            })
+        else {
+            return res.json({
+                success: false,
+                message: "you have no gateway"
+            })
+        }
+
+    }
+    ,
     buyZarinpal: function (req, res, next) {
         let Order = req.mongoose.model('Order');
 

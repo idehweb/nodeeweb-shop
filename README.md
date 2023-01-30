@@ -175,6 +175,9 @@ Nodeeweb is licensed under the GNU GENERAL PUBLIC LICENSE, sponsored and support
 
 ## Changelogs
 
+== 0.0.365
+    create payment link
+
 == 0.0.363
     * add rewriteProducts to fix slug
 

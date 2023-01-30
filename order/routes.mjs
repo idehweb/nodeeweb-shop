@@ -37,6 +37,12 @@ export default [
         "controller": controller.createCart,
     },
     {
+        "path": "/createPaymentLink",
+        "method": "post",
+        "access": "admin_user",
+        "controller": controller.createPaymentLink,
+    },
+    {
         "path": "/cart/:id",
         "method": "post",
         "access": "admin_user,admin_shopManager,customer_all",

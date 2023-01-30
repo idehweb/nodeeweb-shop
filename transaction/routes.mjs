@@ -32,6 +32,11 @@ export default [
         "method": "post",
         "access": "admin_user,admin_shopManager",
     }, {
+        "path": "/create",
+        "method": "post",
+        "access": "admin_user",
+        "controller": controller.create,
+    },{
         "path": "/buy/:_id",
         "method": "get",
         "access": "customer_all",
