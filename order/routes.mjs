@@ -49,6 +49,19 @@ export default [
         "controller": controller.createCart,
     },
     {
+        "path": "/myOrders/onlyMine/:id",
+        "method": "get",
+        "access": "admin_user,admin_shopManager,customer_all",
+        "controller": controller.myOrder,
+    },
+    {
+        "path": "/myOrders/mine/:offset/:limit",
+        "method": "get",
+        "access": "admin_user,admin_shopManager,customer_all",
+        "controller": controller.allWOrders,
+    },
+
+    {
         "path": "/:offset/:limit",
         "method": "get",
         "access": "admin_user,admin_shopManager",

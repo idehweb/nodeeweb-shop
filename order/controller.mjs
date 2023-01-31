@@ -149,7 +149,17 @@ let self = ({
                 _.forEach(orders, (item, i) => {
                     console.log('item._id', item._id)
                     if (item.customer && item.customer._id) {
-                        Order.countDocuments({customer: item.customer._id}, function (err, theOrderCount) {
+                        let sObj={customer: item.customer._id};
+
+                        if (req.query['date_gte']) {
+
+                            sObj['createdAt'] = {$lt: new Date(req.query['date_gte'])};
+                        }
+                        if(search['status']){
+                            sObj['status']=search['status'];
+                        }
+                        // console.log('sObj',sObj)
+                        Order.countDocuments(sObj, function (err, theOrderCount) {
                             orders[i].customer.orderCount = theOrderCount;
                             p++;
                             if (p == thelength) {
@@ -992,8 +1002,71 @@ let self = ({
 
             });
         }
-    }
-    ,
+    },
+    allWOrders: function (req, res, next) {
+        let Order = req.mongoose.model('Order');
+
+        // console.log('allWOrders');
+        let offset = 0;
+        if (req.params.offset) {
+            offset = parseInt(req.params.offset);
+        }
+
+        let search = {};
+        search['customer'] = req.headers.customer_id;
+        // search['status']='published';
+        Order.find(search, '_id updatedAt createdAt card sum amount deliveryPrice orderNumber status paymentStatus deliveryDay customer_data billingAddress transaction', function (err, orders) {
+            if (err || !orders) {
+                res.json([]);
+                return 0;
+            }
+
+            Order.countDocuments(search, function (err, count) {
+                // console.log('countDocuments', count);
+                if (err || !count) {
+                    res.json([]);
+                    return 0;
+                }
+                res.setHeader(
+                    'X-Total-Count',
+                    count,
+                );
+
+
+                // orders.map(resource => ({ ...resource, id: resource._id }))
+                res.json(orders);
+                return 0;
+
+
+            });
+
+        }).populate('customer', 'nickname photos address').skip(offset).sort({_id: -1}).limit(parseInt(req.params.limit)).lean();
+    },
+
+    myOrder: function (req, res, next) {
+        let Order = req.mongoose.model('Order');
+
+        // console.log('hgfgh');
+        let obj={
+            _id: req.params.id,
+            customer: req.headers.customer_id.toString(),
+        }
+        console.log('obj',obj)
+        Order.findOne(obj,
+            function (err, order) {
+                if (err || !order) {
+                    res.json({
+                        success: false,
+                        message: 'error!',
+                    });
+                    return 0;
+                }
+
+                return res.json(order);
+
+            }).populate('customer', 'nickname phoneNumber firstName lastName').populate('transaction', 'Authority amount statusCode status');
+    },
+
     createPaymentLink: function (req, res, next) {
         console.log('creating transaction by admin...');
         // req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
