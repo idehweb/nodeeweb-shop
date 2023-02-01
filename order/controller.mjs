@@ -160,7 +160,7 @@ let self = ({
                         }
                         // console.log('sObj',sObj)
                         Order.countDocuments(sObj, function (err, theOrderCount) {
-                            orders[i].customer.orderCount = theOrderCount;
+                            orders[i].customer.orderCount = (theOrderCount-1);
                             p++;
                             if (p == thelength) {
                                 return res.json(orders);

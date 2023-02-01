@@ -175,6 +175,9 @@ Nodeeweb is licensed under the GNU GENERAL PUBLIC LICENSE, sponsored and support
 
 ## Changelogs
 
+== 0.0.367
+    * add first buy
+
 == 0.0.366
     * add my orders and my order
     
