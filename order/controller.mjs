@@ -83,6 +83,10 @@ let self = ({
 
             search['createdAt'] = {$gt: new Date(req.query['date_gte'])};
         }
+        if (req.query['date_lte']) {
+
+            search['createdAt']['$lt'] = new Date(req.query['date_lte']);
+        }
 
         search['status'] = {
             $nin: ['cart', 'checkout', ''],
