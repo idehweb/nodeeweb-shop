@@ -271,13 +271,14 @@ let self = ({
 
                                     }
                                 }
-                                if (ps.combinations[inde].quantity) {
-                                    ps.combinations[inde].quantity--;
-                                }
+
                                 if (ps.combinations[inde].quantity == 0) {
                                     ps.combinations[inde].in_stock = false;
                                     comb.in_stock = false
 
+                                }
+                                if (ps.combinations[inde].quantity) {
+                                    ps.combinations[inde].quantity--;
                                 }
                                 if (comb.in_stock == false) {
                                     return res.json({
@@ -326,11 +327,12 @@ let self = ({
 
                         }
 
-                    if (ps.quantity) {
-                        ps.quantity--;
-                    }
+
                     if (ps.quantity == 0) {
                         ps.in_stock = false;
+                    }
+                    if (ps.quantity) {
+                        ps.quantity--;
                     }
                     if (ps.in_stock == false) {
                         return res.json({
@@ -688,54 +690,63 @@ let self = ({
             Product.findOne({_id: id}, '_id combinations type price salePrice title', function (err, ps) {
                 console.log('found id:', id, 'main_id[1]:', main_id[1], 'ps', ps);
                 ii++;
-                if (ps.combinations) {
-                    _.forEach(ps.combinations, function (comb, inde) {
-                        if ((inde == main_id[1]) || (comb.id == main_id[1])) {
-                            console.log('find comb', comb);
-                            if (pack.salePrice) {
-                                if (pack.salePrice != comb.salePrice) {
-                                    return res.json({
-                                        success: false,
-                                        message: 'مغایرت در قیمت ها!',
-                                        'pack.salePrice': pack.salePrice,
-                                        'comb.salePrice': comb.salePrice,
-                                        'ps.type': ps.type,
-                                        'ps.title': ps.title,
-                                        'err': 1,
-                                    });
-                                    // return 0;
+                if (ps.type != 'normal') {
+                    if (ps.combinations) {
+                        _.forEach(ps.combinations, function (comb, inde) {
+                            if ((inde == main_id[1]) || (comb.id == main_id[1])) {
+                                console.log('find comb', comb);
+                                if (pack.salePrice) {
+                                    if (pack.salePrice != comb.salePrice) {
+                                        return res.json({
+                                            success: false,
+                                            message: 'مغایرت در قیمت ها!',
+                                            'pack.salePrice': pack.salePrice,
+                                            'comb.salePrice': comb.salePrice,
+                                            'ps.type': ps.type,
+                                            'ps.title': ps.title,
+                                            'err': 1,
+                                        });
+                                        // return 0;
+
+                                    }
+                                } else if (pack.price) {
+                                    if (pack.price != comb.price) {
+                                        return res.json({
+                                            success: false,
+                                            message: 'مغایرت در قیمت ها!',
+                                            'pack.price': pack.price,
+                                            'comb.price': comb.price,
+                                            'ps.type': ps.type,
+                                            'ps.title': ps.title,
+                                            'err': 2,
+
+                                        });
+                                        // return 0;
+
+                                    }
+                                }
+                                if (ps.combinations[inde].quantity == 0) {
+                                    ps.combinations[inde].in_stock = false;
+                                    comb.in_stock = false
 
                                 }
-                            } else if (pack.price) {
-                                if (pack.price != comb.price) {
+                                if (ps.combinations[inde].quantity) {
+                                    ps.combinations[inde].quantity--;
+                                }
+                                if (comb.in_stock == false) {
                                     return res.json({
                                         success: false,
-                                        message: 'مغایرت در قیمت ها!',
-                                        'pack.price': pack.price,
-                                        'comb.price': comb.price,
+                                        message: 'مغایرت در موجودی!',
+                                        'comb.in_stock': comb.in_stock,
                                         'ps.type': ps.type,
                                         'ps.title': ps.title,
-                                        'err': 2,
 
                                     });
                                     // return 0;
-
                                 }
                             }
-
-                            if (comb.in_stock == false) {
-                                return res.json({
-                                    success: false,
-                                    message: 'مغایرت در موجودی!',
-                                    'comb.in_stock': comb.in_stock,
-                                    'ps.type': ps.type,
-                                    'ps.title': ps.title,
-
-                                });
-                                // return 0;
-                            }
-                        }
-                    });
+                        });
+                    }
                 }
                 if (ps.type == 'normal') {
                     if (pack.salePrice) {
@@ -768,20 +779,26 @@ let self = ({
                             // return 0;
 
                         }
-                }
-                if (ps.in_stock == false) {
-                    return res.json({
-                        success: false,
-                        message: 'مغایرت در موجودی!',
-                        'ps.in_stock': ps.in_stock,
-                        'ps.type': ps.type,
-                        'ps.title': ps.title,
 
-                    });
-                    // return 0;
-                }
-                // }
+                    if (ps.quantity == 0) {
+                        ps.in_stock = false;
+                    }
 
+                    if (ps.quantity) {
+                        ps.quantity--;
+                    }
+                    if (ps.in_stock == false) {
+                        return res.json({
+                            success: false,
+                            message: 'مغایرت در موجودی!',
+                            'ps.in_stock': ps.in_stock,
+                            'ps.type': ps.type,
+                            'ps.title': ps.title,
+
+                        });
+                        // return 0;
+                    }
+                }
 
                 console.log('ii', ii);
                 console.log('len', len);
@@ -1520,6 +1537,14 @@ let self = ({
 
                     }
                     if (item.data.status == 'pws-ready-to-ship') {
+                        obj['status'] = 'makingready';
+                        obj['paymentStatus'] = 'paid';
+                        obj['paid'] = 'true';
+
+                        // obj['paymentStatus']='paid';
+
+                    }
+                    if (item.data.status == 'pws-shipping') {
                         obj['status'] = 'makingready';
                         obj['paymentStatus'] = 'paid';
                         obj['paid'] = 'true';

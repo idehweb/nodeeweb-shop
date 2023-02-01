@@ -175,6 +175,9 @@ Nodeeweb is licensed under the GNU GENERAL PUBLIC LICENSE, sponsored and support
 
 ## Changelogs
 
+== 0.0.369
+    * remove bugs of add order on quantity 0
+
 == 0.0.368
     * add $lt and export orders
 
