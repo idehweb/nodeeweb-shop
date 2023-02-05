@@ -129,6 +129,7 @@ let self = ({
             delete search['status'];
 
         }
+        let f = [];
 
         console.log('search', search);
         Order.find(search, '_id , orderNumber , customer_data , customer , sum , amount , paymentStatus , status , createdAt , updatedAt', function (err, orders) {
@@ -153,21 +154,29 @@ let self = ({
                 _.forEach(orders, (item, i) => {
                     console.log('item._id', item._id)
                     if (item.customer && item.customer._id) {
-                        let sObj={customer: item.customer._id};
+                        let sObj = {customer: item.customer._id};
 
                         if (req.query['date_gte']) {
 
                             sObj['createdAt'] = {$lt: new Date(req.query['date_gte'])};
                         }
-                        if(search['status']){
-                            sObj['status']=search['status'];
+                        if (search['status']) {
+                            sObj['status'] = search['status'];
                         }
                         // console.log('sObj',sObj)
                         Order.countDocuments(sObj, function (err, theOrderCount) {
-                            orders[i].customer.orderCount = (theOrderCount-1);
+                            orders[i].customer.orderCount = (theOrderCount - 0);
+                            if (req.query.orderCount) {
+                                if (orders[i].customer.orderCount > req.query.orderCount) {
+                                    f.push(orders[i]);
+                                }
+                            }else{
+                                f.push(orders[i]);
+
+                            }
                             p++;
                             if (p == thelength) {
-                                return res.json(orders);
+                                return res.json(f);
                                 // 0;
                             }
                         })
@@ -175,7 +184,7 @@ let self = ({
                         p++;
                     }
                     if (p == thelength) {
-                        return res.json(orders);
+                        return res.json(f);
                         // 0;
                     }
                 })
@@ -1069,11 +1078,11 @@ let self = ({
         let Order = req.mongoose.model('Order');
 
         // console.log('hgfgh');
-        let obj={
+        let obj = {
             _id: req.params.id,
             customer: req.headers.customer_id.toString(),
         }
-        console.log('obj',obj)
+        console.log('obj', obj)
         Order.findOne(obj,
             function (err, order) {
                 if (err || !order) {
