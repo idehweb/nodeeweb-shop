@@ -6,6 +6,7 @@ import stringMath from "string-math";
 
 let self = ({
     all: function (req, res, next) {
+        console.log('get all orders...')
         let Order = req.mongoose.model('Order');
 
         let offset = 0;
@@ -152,7 +153,7 @@ let self = ({
                     count,
                 );
                 _.forEach(orders, (item, i) => {
-                    console.log('item._id', item._id)
+                    console.log('item._id', item._id,item.customer)
                     if (item.customer && item.customer._id) {
                         let sObj = {customer: item.customer._id};
 
@@ -167,23 +168,33 @@ let self = ({
                         Order.countDocuments(sObj, function (err, theOrderCount) {
                             orders[i].customer.orderCount = (theOrderCount - 0);
                             if (req.query.orderCount) {
+                                console.log('req.query.orderCount',req.query.orderCount)
                                 if (orders[i].customer.orderCount > req.query.orderCount) {
-                                    f.push(orders[i]);
+                                    console.log('f1 push ',i)
+
                                 }
                             }else{
-                                f.push(orders[i]);
+                                console.log('f2 push ',i)
 
                             }
+                            f[i]=(orders[i]);
+
                             p++;
                             if (p == thelength) {
+                                console.log('here...',p,thelength)
                                 return res.json(f);
                                 // 0;
                             }
                         })
                     } else {
+                        f[i]=(orders[i]);
+
+
                         p++;
                     }
                     if (p == thelength) {
+                        console.log('here2...')
+
                         return res.json(f);
                         // 0;
                     }
@@ -203,7 +214,7 @@ let self = ({
     },
 
     createByCustomer: function (req, res, next) {
-        console.log('createByCustomer...');
+        console.log('createByCustomer... , ',req.headers);
         let Product = req.mongoose.model('Product');
         let Order = req.mongoose.model('Order');
         let Settings = req.mongoose.model('Settings');
@@ -365,6 +376,8 @@ let self = ({
                 tempProducts.push(ps);
                 req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
                 // return;
+                req.body.customer = req.headers._id;
+
                 if (ii == len) {
                     console.log('\ntempProducts: ', tempProducts)
                     req.global.checkSiteStatus().then(function (resp) {
@@ -375,7 +388,6 @@ let self = ({
                             // console.log('setting.taxAmount', setting.taxAmount)
                             // if (setting.taxAmount)
                             //     taxAmount = setting.taxAmount;
-                            req.body.customer = req.headers.customer_id;
 
                             if (taxAmount) {
                                 let theTaxAmount = parseInt(req.body.sum * (taxAmount / 100));
@@ -389,6 +401,7 @@ let self = ({
                                 // req.body.taxAmount = taxAmount;
                                 // req.body.amount=taxAmount+req.body.amount;
                             }
+                            console.log('req.body.customer',req.body.customer)
                             let lastObject = {
                                 "billingAddress": req.body.billingAddress,
                                 "amount": req.body.amount,
