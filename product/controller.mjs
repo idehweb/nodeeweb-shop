@@ -75,6 +75,7 @@ let self = ({
         });
         // console.log('search', search);
         let thef = '';
+
         function isStringified(jsonValue) { // use this function to check
             try {
                 console.log("need to parse");
@@ -86,15 +87,23 @@ let self = ({
             }
         }
 
-        console.log('req.query.filter',req.query.filter)
+        console.log('req.query.filter', req.query.filter)
         if (req.query.filter) {
             const json = isStringified(req.query.filter);
 
             if (typeof json == "object") {
                 console.log("string is a valid json");
                 thef = JSON.parse(req.query.filter);
+                if (thef.search) {
 
-            }else{
+                    thef["title." + req.headers.lan] = {
+                        $exists: true,
+                        "$regex": thef.search,
+                        "$options": "i"
+                    };
+                    delete thef.search
+                }
+            } else {
                 console.log("string is not a valid json")
             }
             // if (JSON.parse(req.query.filter)) {
@@ -282,7 +291,7 @@ let self = ({
         Product.find({}, function (err, products) {
             _.forEach(products, (item) => {
                 let obj = {};
-                if(item['slug']) {
+                if (item['slug']) {
                     obj['slug'] = item['slug'].replace(/\s+/g, '-').toLowerCase();
                     // if (item.price) {
                     //     obj['price'] = (item.price /109) * 100
