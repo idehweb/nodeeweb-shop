@@ -1057,8 +1057,9 @@ let self = ({
         }
 
         let search = {};
-        search['customer'] = req.headers.customer_id;
+        search['customer'] = req.headers._id;
         // search['status']='published';
+        console.log('search',search)
         Order.find(search, '_id updatedAt createdAt card sum amount deliveryPrice orderNumber status paymentStatus deliveryDay customer_data billingAddress transaction', function (err, orders) {
             if (err || !orders) {
                 res.json([]);
