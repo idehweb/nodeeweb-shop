@@ -36,6 +36,8 @@ export default [
         "path": "/",
         "method": "post",
         "access": "admin_user,admin_shopManager",
+        "controller": controller.createByAdmin,
+
     },
     // {
     //     "path": "/importFromWordpress",
@@ -59,6 +61,8 @@ export default [
         "path": "/:id",
         "method": "put",
         "access": "admin_user,admin_shopManager",
+        "controller": controller.editByAdmin,
+
     },
     {
         "path": "/:id",

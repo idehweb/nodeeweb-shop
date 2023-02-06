@@ -12,6 +12,8 @@ let self = ({
             return res.show()
 
         }
+        let sort = {in_stock: -1}
+
         console.log('==> getAll()', Product);
         let offset = 0;
         if (req.params.offset) {
@@ -142,7 +144,7 @@ let self = ({
                             return res.json(products);
 
                         })
-                    }).populate('productCategory', '_id slug').skip(offset).sort({_id: -1}).limit(parseInt(req.params.limit));
+                    }).populate('productCategory', '_id slug').skip(offset).sort(sort).limit(parseInt(req.params.limit));
                 }
 
             });
@@ -153,7 +155,7 @@ let self = ({
                 search['status'] = 'published'
             console.log('search q.exec', search)
 
-            q = Product.find(search, fields).populate('productCategory', '_id slug').skip(offset).sort({_id: -1}).limit(parseInt(req.params.limit));
+            q = Product.find(search, fields).populate('productCategory', '_id slug').skip(offset).sort(sort).limit(parseInt(req.params.limit));
             q.exec(function (err, model) {
 
                 console.log('err', err)
@@ -177,6 +179,101 @@ let self = ({
 
     },
 
+    createByAdmin: function (req, res, next) {
+        let Product = req.mongoose.model('Product');
+        if (!req.body) {
+            req.body = {}
+        }
+        if (!req.body.type) {
+            req.body.type = 'normal';
+        }
+        if (req.body && req.body.slug) {
+            req.body.slug = req.body.slug.replace(/\s+/g, '-').toLowerCase();
+        }
+
+        if (req.body.type == 'variable') {
+            req.body.in_stock = false;
+            if (req.body.combinations) {
+                _.forEach(req.body.combinations, (comb) => {
+                    if (comb.in_stock && comb.quantity != 0) {
+                        req.body.in_stock = true;
+                    }
+
+                });
+            }
+        }
+        if (req.body.type == 'normal') {
+            // delete req.body.options;
+            delete req.body.combinations;
+        }
+        Product.create(req.body, function (err, menu) {
+            if (err || !menu) {
+                res.json({
+                    err: err,
+                    success: false,
+                    message: 'error!'
+                });
+                return 0;
+            }
+            res.json(menu);
+            return 0;
+
+        });
+    },
+
+    editByAdmin: function (req, res, next) {
+        let Product = req.mongoose.model('Product');
+
+        if (!req.params.id) {
+
+            return res.json({
+                success: false,
+                message: 'send /edit/:id please, you did not enter id',
+            });
+
+
+        }
+        if (!req.body) {
+            req.body = {}
+        }
+        if (!req.body.type) {
+            req.body.type = 'normal';
+        }
+        //export new object saved
+        if (req.body.slug) {
+            req.body.slug = req.body.slug.replace(/\s+/g, '-').toLowerCase();
+        }
+        if (req.body.type == 'variable') {
+            req.body.in_stock = false;
+            if (req.body.combinations) {
+                _.forEach(req.body.combinations, (comb) => {
+                    if (comb.in_stock && comb.quantity != 0) {
+                        req.body.in_stock = true;
+                    }
+
+                });
+            }
+        }
+        if (req.body.type == 'normal') {
+            // delete req.body.options;
+            delete req.body.combinations;
+        }
+        Product.findByIdAndUpdate(req.params.id, req.body, {new: true}, function (err, menu) {
+            if (err || !menu) {
+                res.json({
+                    success: false,
+                    message: 'error!',
+                    err: err
+                });
+                return 0;
+            }
+
+            res.json(menu);
+            return 0;
+
+        });
+    }
+    ,
     importFromWordpress: function (req, res, next) {
         let url = '';
         if (req.query.url) {
@@ -287,12 +384,30 @@ let self = ({
     },
     rewriteProducts: function (req, res, next) {
         let Product = req.mongoose.model('Product');
-        let Media = req.mongoose.model('Media');
+        let p = 0;
+        // let Media = req.mongoose.model('Media');
         Product.find({}, function (err, products) {
             _.forEach(products, (item) => {
                 let obj = {};
                 if (item['slug']) {
-                    obj['slug'] = item['slug'].replace(/\s+/g, '-').toLowerCase();
+                    // obj['slug'] = item['slug'].replace(/\s+/g, '-').toLowerCase();
+                    item['slug'] = item['slug'].replace(/\s+/g, '-').toLowerCase();
+
+                    if (item.type == 'variable') {
+                        item.in_stock = false;
+                        if (item.combinations) {
+                            _.forEach(item.combinations, (comb) => {
+                                if (comb.in_stock && comb.quantity != 0) {
+                                    item.in_stock = true;
+                                }
+
+                            });
+                        }
+                    }
+                    if (item.type == 'normal') {
+                        // delete item.options;
+                        delete item.combinations;
+                    }
                     // if (item.price) {
                     //     obj['price'] = (item.price /109) * 100
                     // }
@@ -305,12 +420,21 @@ let self = ({
                     // if (item.data.regular_price) {
                     //     obj['salePrice'] = item.data.sale_price;
                     // }
-                    Product.findByIdAndUpdate(item._id, obj, function (err, products) {
+                    Product.findByIdAndUpdate(item._id, item, function (err, pro) {
+                        p++;
+                        console.log('p: ', p, ' products.length:', products.length)
+                        if (p == products.length) {
+                            return res.json({
+                                success: true
+                            })
+                        }
+
                     })
                 }
             })
         })
     },
+
     torob: function (req, res, next) {
         console.log("it is Torob!");
         let offset = 0;
