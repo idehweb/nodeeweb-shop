@@ -121,6 +121,7 @@ let self = ({
             let ProductCategory = req.mongoose.model('ProductCategory');
 
             console.log('search[\'productCategory.slug\']', search['productCategory.slug'])
+
             ProductCategory.findOne({slug: search['productCategory.slug']}, function (err, productcategory) {
                 console.log('err', err)
                 console.log('req', productcategory)
@@ -130,9 +131,16 @@ let self = ({
                     // console.log({productCategory: {
                     //         $in:[productcategory._id]
                     //     }})
-                    Product.find({"productCategory": productcategory._id}, function (err, products) {
+                    let ss={"productCategory": productcategory._id};
+                    if(thef.device){
+                        ss['attributes.values']=thef.device
+                    }
+                    if(thef.brand){
+                        ss['attributes.values']=thef.brand
+                    }
+                    Product.find(ss, function (err, products) {
 
-                        Product.countDocuments({"productCategory": productcategory._id}, function (err, count) {
+                        Product.countDocuments(ss, function (err, count) {
                             if (err || !count) {
                                 res.json([]);
                                 return 0;
