@@ -175,6 +175,9 @@ Nodeeweb is licensed under the GNU GENERAL PUBLIC LICENSE, sponsored and support
 
 ## Changelogs
 
+== 0.0.377
+    * add track view in product
+
 == 0.0.375
     * bugs of my orders
 

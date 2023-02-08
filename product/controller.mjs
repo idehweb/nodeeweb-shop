@@ -3,6 +3,7 @@ import path from 'path'
 import mime from 'mime'
 import fs from 'fs'
 import https from 'https'
+import requestIp from "request-ip";
 
 let self = ({
 
@@ -803,7 +804,86 @@ let self = ({
 
                 }).lean();
         });
-    }
+    },
+    viewOne: function (req, res, next) {
+        let Product = req.mongoose.model('Product');
+        const ObjectId = req.mongoose.Types.ObjectId;
+
+// Validator function
+        function isValidObjectId(id){
+
+            if(ObjectId.isValid(id)){
+                if((String)(new ObjectId(id)) === id)
+                    return true;
+                return false;
+            }
+            return false;
+        }
+        let obj = {};
+        console.log('req.params.id',req.params.id)
+        if (isValidObjectId(req.params.id)) {
+            obj["_id"] = req.params.id;
+        } else {
+            obj["slug"] = req.params.id;
+
+        }
+        console.log('get product: ',obj)
+        Product.findOne(obj,
+            function (err, product) {
+                if (err || !product) {
+                    res.json({
+                        success: false,
+                        message: "error!",
+                        err: err
+                    });
+                    return 0;
+                }
+
+                let views = product.views;
+                if (!views) {
+                    views = [];
+                }
+
+                views.push({
+                    userIp: requestIp.getClientIp(req),
+                    createdAt: new Date()
+                });
+                Product.findByIdAndUpdate(req.params.id, {
+                        "$set": {
+                            // getContactData: product.getContactData,
+                            views: views
+                        }
+                    },
+                    {
+                        "fields": {"_id": 1}
+                    }, function (err, updatedProduct) {
+                    });
+                // delete product.views;
+                if (product.views) {
+                    product.views = product.views.length;
+                } else {
+                    product.views = 0;
+                }
+                if (product.like) {
+                    product.like = product.like.length;
+                } else {
+                    product.like = 0;
+                }
+                delete product.getContactData;
+                delete product.transaction;
+                delete product.relatedProducts;
+                delete product.firstCategory;
+                // Product.findOne({_id: {$lt: req.params.id}}, "_id title", function (err, pl) {
+                //     if (pl && pl._id && pl.title)
+                //         product.nextProduct = {_id: pl._id, title: pl.title[req.headers.lan]};
+                //     res.json(product);
+                //     return 0;
+                // }).sort({_id: 1}).limit(1);
+
+                res.json(product);
+
+            }).lean();
+    },
 
 
 });

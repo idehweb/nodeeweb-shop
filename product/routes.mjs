@@ -28,6 +28,8 @@ export default [
         "path": "/:id",
         "method": "get",
         "access": "customer_all",
+        "controller": controller.viewOne,
+
         // "controller":()=>{
         //     console.log('hi')
         // }

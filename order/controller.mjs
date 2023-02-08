@@ -153,7 +153,7 @@ let self = ({
                     count,
                 );
                 _.forEach(orders, (item, i) => {
-                    console.log('item._id', item._id,item.customer)
+                    console.log('item._id', item._id, item.customer)
                     if (item.customer && item.customer._id) {
                         let sObj = {customer: item.customer._id};
 
@@ -168,26 +168,26 @@ let self = ({
                         Order.countDocuments(sObj, function (err, theOrderCount) {
                             orders[i].customer.orderCount = (theOrderCount - 0);
                             if (req.query.orderCount) {
-                                console.log('req.query.orderCount',req.query.orderCount)
+                                console.log('req.query.orderCount', req.query.orderCount)
                                 if (orders[i].customer.orderCount > req.query.orderCount) {
-                                    console.log('f1 push ',i)
+                                    console.log('f1 push ', i)
 
                                 }
-                            }else{
-                                console.log('f2 push ',i)
+                            } else {
+                                console.log('f2 push ', i)
 
                             }
-                            f[i]=(orders[i]);
+                            f[i] = (orders[i]);
 
                             p++;
                             if (p == thelength) {
-                                console.log('here...',p,thelength)
+                                console.log('here...', p, thelength)
                                 return res.json(f);
                                 // 0;
                             }
                         })
                     } else {
-                        f[i]=(orders[i]);
+                        f[i] = (orders[i]);
 
 
                         p++;
@@ -214,7 +214,7 @@ let self = ({
     },
 
     createByCustomer: function (req, res, next) {
-        console.log('createByCustomer... , ',req.headers);
+        console.log('createByCustomer... , ', req.headers);
         let Product = req.mongoose.model('Product');
         let Order = req.mongoose.model('Order');
         let Settings = req.mongoose.model('Settings');
@@ -401,7 +401,7 @@ let self = ({
                                 // req.body.taxAmount = taxAmount;
                                 // req.body.amount=taxAmount+req.body.amount;
                             }
-                            console.log('req.body.customer',req.body.customer)
+                            console.log('req.body.customer', req.body.customer)
                             let lastObject = {
                                 "billingAddress": req.body.billingAddress,
                                 "amount": req.body.amount,
@@ -526,7 +526,7 @@ let self = ({
 
                                     Order.findOneAndUpdate(
                                         {order_id: req.body.order_id}, {
-                                            $set: lastObject,
+                                            $set: {...lastObject, updatedAt: new Date()},
                                             $push: {
                                                 statusArray: {status: 'processing'},
                                             },
@@ -1059,7 +1059,7 @@ let self = ({
         let search = {};
         search['customer'] = req.headers._id;
         // search['status']='published';
-        console.log('search',search)
+        console.log('search', search)
         Order.find(search, '_id updatedAt createdAt card sum amount deliveryPrice orderNumber status paymentStatus deliveryDay customer_data billingAddress transaction', function (err, orders) {
             if (err || !orders) {
                 res.json([]);
