@@ -165,6 +165,7 @@ var self = ({
                             // return res.json({
                             //     ...obj, gateway: JSON.parse(gateway.request),
                             // });
+                            req.publishToTelegram("paying order:"+order.orderNumber)
                             Transaction.create(obj, function (err, transaction) {
                                 if (err || !transaction) {
                                     return res.json({
