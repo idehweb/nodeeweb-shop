@@ -13,6 +13,7 @@ export default (mongoose)=>{
         },
         image: String,
         data: {},
+        description: {},
         values:[],
         parent:{type: mongoose.Schema.Types.ObjectId, ref: 'ProductCategory'} //category_id
     });

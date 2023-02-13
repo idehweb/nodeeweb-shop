@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="49bb18a3-8663-4ba3-b14f-a7999451c504" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product/controller.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/product/controller.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/transaction/controller.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/transaction/controller.mjs" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -14,11 +14,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="controller.mjs" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/product/controller.mjs">
+      <file leaf-file-name="controller.mjs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/order/controller.mjs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="117">
-              <caret line="264" column="9" selection-start-line="264" selection-start-column="9" selection-end-line="264" selection-end-column="9" />
+            <state relative-caret-position="-429">
+              <caret line="484" column="69" selection-start-line="484" selection-start-column="66" selection-end-line="484" selection-end-column="69" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
               </folding>
@@ -26,11 +26,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="package.json" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/package.json">
+      <file leaf-file-name="model.mjs" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/product/model.mjs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="54">
-              <caret line="2" column="21" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="21" />
+            <state relative-caret-position="-682">
+              <caret line="17" column="11" selection-start-line="17" selection-start-column="8" selection-end-line="17" selection-end-column="11" />
             </state>
           </provider>
         </entry>
@@ -48,10 +48,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>expressSitemapXml</find>
-      <find>categoryController</find>
-      <find>allSXml</find>
-      <find>__dirname</find>
       <find>allAsXml</find>
       <find>torob</find>
       <find>request</find>
@@ -78,6 +74,10 @@
       <find>rewriteProducts</find>
       <find>allWOrders</find>
       <find>viewOne</find>
+      <find>editByA</find>
+      <find>telegram</find>
+      <find>discount</find>
+      <find>sku</find>
     </findStrings>
     <replaceStrings>
       <replace>300088103373</replace>
@@ -151,16 +151,16 @@
         <option value="$PROJECT_DIR$/transaction/model.mjs" />
         <option value="$PROJECT_DIR$/discount/controller.mjs" />
         <option value="$PROJECT_DIR$/transaction/routes.mjs" />
-        <option value="$PROJECT_DIR$/transaction/controller.mjs" />
         <option value="$PROJECT_DIR$/order/model.mjs" />
         <option value="$PROJECT_DIR$/order/routes.mjs" />
-        <option value="$PROJECT_DIR$/order/controller.mjs" />
         <option value="$PROJECT_DIR$/product/routes.mjs" />
-        <option value="$PROJECT_DIR$/package.json" />
         <option value="&lt;48cf1574-cd24-446a-bb84-123e32c67a35&gt;/home/laminin/public_html/error_log" />
         <option value="&lt;48cf1574-cd24-446a-bb84-123e32c67a35&gt;/home/laminin/public_html/api.php" />
+        <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/transaction/controller.mjs" />
         <option value="$PROJECT_DIR$/product/controller.mjs" />
+        <option value="$PROJECT_DIR$/order/controller.mjs" />
       </list>
     </option>
   </component>
@@ -365,12 +365,12 @@
       <workItem from="1675422201291" duration="246000" />
       <workItem from="1675422509524" duration="5630000" />
       <workItem from="1675595875234" duration="7794000" />
-      <workItem from="1675751462484" duration="10296000" />
+      <workItem from="1675751462484" duration="14027000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="398785000" />
+    <option name="totallyTimeSpent" value="402516000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
@@ -450,22 +450,12 @@
           <option name="timeStamp" value="20" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/transaction/controller.mjs</url>
-          <line>221</line>
-          <option name="timeStamp" value="24" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/transaction/controller.mjs</url>
-          <line>610</line>
-          <option name="timeStamp" value="25" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/product/controller.mjs</url>
-          <line>450</line>
+          <line>452</line>
           <option name="timeStamp" value="27" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="28" />
+      <option name="time" value="29" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
@@ -711,20 +701,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/transaction/controller.mjs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="551">
-          <caret line="175" column="36" selection-start-line="175" selection-start-column="36" selection-end-line="175" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/product/model.mjs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="5" column="27" selection-start-line="5" selection-start-column="27" selection-end-line="5" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/order/model.mjs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1566">
@@ -736,17 +712,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1620">
           <caret line="60" column="43" selection-start-line="60" selection-start-column="33" selection-end-line="60" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/order/controller.mjs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-5622">
-          <caret line="423" selection-start-line="423" selection-end-line="423" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-            <element signature="e#204#7251#0" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -767,8 +732,8 @@
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="98">
-            <caret line="177" column="10" selection-start-line="177" selection-start-column="10" selection-end-line="177" selection-end-column="10" />
+          <first_editor relative-caret-position="125">
+            <caret line="178" column="31" selection-start-line="178" selection-start-column="31" selection-end-line="178" selection-end-column="31" />
           </first_editor>
           <second_editor />
         </state>
@@ -776,18 +741,47 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="2" column="21" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="21" />
+        <state relative-caret-position="108">
+          <caret line="4" column="19" lean-forward="true" selection-start-line="4" selection-start-column="19" selection-end-line="4" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transaction/controller.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="452">
+          <caret line="1433" column="20" selection-start-line="1433" selection-start-column="20" selection-end-line="1433" selection-end-column="20" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+            <element signature="e#322#359#0" expanded="true" />
+            <element signature="e#7904#10079#0" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/product/controller.mjs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="264" column="9" selection-start-line="264" selection-start-column="9" selection-end-line="264" selection-end-column="9" />
+        <state relative-caret-position="333">
+          <caret line="272" column="9" lean-forward="true" selection-start-line="272" selection-start-column="9" selection-end-line="272" selection-end-column="9" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/order/controller.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-429">
+          <caret line="484" column="69" selection-start-line="484" selection-start-column="66" selection-end-line="484" selection-end-column="69" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/product/model.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-682">
+          <caret line="17" column="11" selection-start-line="17" selection-start-column="8" selection-end-line="17" selection-end-column="11" />
         </state>
       </provider>
     </entry>

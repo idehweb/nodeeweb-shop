@@ -17,6 +17,7 @@ export default (mongoose)=>{
             default: true
         },
         data: {},
+        description: {},
         values:[],
         // parent:{type: mongoose.Schema.Types.ObjectId, ref: 'Attributes'} //category_id
     });

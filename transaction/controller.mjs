@@ -165,7 +165,21 @@ var self = ({
                             // return res.json({
                             //     ...obj, gateway: JSON.parse(gateway.request),
                             // });
-                            req.publishToTelegram("paying order:"+order.orderNumber)
+                            let notif = "paying ";
+                            if(order.amount){
+                                notif+=order.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                            }
+                            notif += "\nfor order: " + order.orderNumber;
+                            if (order.customer.phoneNumber)
+                                notif += "\nphoneNumber:" + order.customer.phoneNumber;
+                            if (order.customer.firstName)
+                                notif += "\nname:" + order.customer.firstName;
+                            if (order.customer.lastName)
+                                notif += " " + order.customer.lastName + "\n";
+
+                            // console.log('notif',notif);
+                            req.publishToTelegram(notif)
+                            // return;
                             Transaction.create(obj, function (err, transaction) {
                                 if (err || !transaction) {
                                     return res.json({
@@ -205,7 +219,12 @@ var self = ({
                                 });
                             });
 
-                        }).catch(e => res.json({e, requ: theReq}))
+                        }).catch(e => {
+                            req.publishToTelegram('error creating transaction! please check...' + "\nfor order:" + order.orderNumber + "\namount:" + order.amount)
+
+                            res.json({e, requ: theReq})
+
+                        })
 
 
                     }).populate("customer", "_id phoneNumber firstName lastName");
@@ -523,7 +542,7 @@ var self = ({
                     objd.message = $tz;
 // let im='';
 //                 console.log('objd', objd);
-                    req.global.publishToTelegram(objd);
+                    req.publishToTelegram(objd);
                     //
                     // rp(options)
                     //     .then(function (parsedBody) {
@@ -1135,7 +1154,7 @@ var self = ({
                                                         value: process.env.SHOP_URL + "/my-account/"
                                                     }], "300088103373", null, "98", "sms_submitOrderSuccessPaying");
 
-                                            req.global.publishToTelegram(objd);
+                                            req.publishToTelegram(objd);
 
                                             // console.log('order.deliveryDay', order.deliveryDay);
                                             if (order.deliveryDay && order.deliveryDay.theid == "chapar") {

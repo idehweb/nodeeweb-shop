@@ -271,6 +271,8 @@ let self = ({
             // delete req.body.options;
             delete req.body.like;
         }
+        req.body.updatedAt = new Date();
+
         Product.findByIdAndUpdate(req.params.id, req.body, {new: true}, function (err, menu) {
             if (err || !menu) {
                 res.json({
