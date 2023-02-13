@@ -35,6 +35,7 @@ export default (mongoose)=>{
         views: [],
         addToCard: [],
         title: {},
+        metatitle: {},
         metadescription: {},
         keywords: {},
         slug: {
