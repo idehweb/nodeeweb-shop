@@ -11,7 +11,7 @@ export default [
         "path": "/status",
         "method": "get",
         "access": "admin_user,admin_shopManager",
-        "controller": controller.statusZibal,
+        "controller": controller.status,
 
     },{
         "path": "/verify",

@@ -271,6 +271,10 @@ let self = ({
             // delete req.body.options;
             delete req.body.like;
         }
+        if (!req.body.status || req.body.status=='') {
+            // delete req.body.options;
+            req.body.status='processings';
+        }
         req.body.updatedAt = new Date();
 
         Product.findByIdAndUpdate(req.params.id, req.body, {new: true}, function (err, menu) {
