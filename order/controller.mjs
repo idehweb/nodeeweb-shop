@@ -1381,8 +1381,8 @@ let self = ({
         }
     },
     sendReq: function (req, theUrl, page) {
-        page=parseInt(page)
-        console.log('get:',theUrl,'page:',page)
+        page = parseInt(page)
+        console.log('get:', theUrl, 'page:', page)
         let url = theUrl;
         url += '&page=' + page;
         console.log('theUrl:', url);
@@ -1422,7 +1422,7 @@ let self = ({
                 console.log('created dat id:', dat.id)
                 Order.create(obj, function (err, ord) {
                     let y = page + 1;
-                    self.checkOrder(req,ord)
+                    self.checkOrder(req, ord)
                     self.sendReq(req, theUrl, y);
 
                 })
@@ -1431,7 +1431,7 @@ let self = ({
         }).catch(e => {
             console.log('#page =====>     error')
 
-            let y = page ;
+            let y = page;
 
             self.sendReq(req, theUrl, y);
         });
@@ -1467,7 +1467,7 @@ let self = ({
 
 
     },
-    checkOrder: function (req, item,k=-1) {
+    checkOrder: function (req, item, k = -1) {
         let Customer = req.mongoose.model('Customer');
         let Order = req.mongoose.model('Order');
         let Media = req.mongoose.model('Media');
@@ -1481,6 +1481,29 @@ let self = ({
         if (item.data && item.data.date_modified) {
             // console.log('date_created', item.data.date_created, new Date(item.data.date_created))
             obj['updatedAt'] = moment(item.data.date_modified).format();
+        }
+        if (item.data && item.data.coupon_lines) {
+            _.forEach(item.data.coupon_lines, (coupon_lines) => {
+                let dcode = coupon_lines.code;
+                let discountAmount = coupon_lines.discount;
+                if(dcode){
+                    obj['discountCode']=dcode
+                }
+                if(discountAmount){
+                    obj['discountAmount']=discountAmount
+                }
+                if(coupon_lines.meta_data && coupon_lines.meta_data[0]) {
+                    let discount = coupon_lines.meta_data[0].display_value.amount;
+
+                    if (discount) {
+                        obj['discount'] = discount
+                    }
+                }
+            })
+        }
+        if(item.data && item.data.discount_total && item.data.discount_tax){
+            obj['discountAmount']=parseInt(item.data.discount_total) + parseInt(item.data.discount_tax)
+
         }
         if (item.data && item.data.line_items) {
             let theCart = [], thePackage = [];
@@ -1677,8 +1700,8 @@ let self = ({
                             'email': item.data.billing.email,
                             // 'internationalCode': item.data.billing.email,
                         }
-                        if(custObj['internationalCode']){
-                            obj['customer_data']['internationalCode']=custObj['internationalCode']
+                        if (custObj['internationalCode']) {
+                            obj['customer_data']['internationalCode'] = custObj['internationalCode']
                         }
                         // if(!item.data.billing.last_name){
                         //     console.log(item.orderNumber+' has not last name')
@@ -1737,7 +1760,7 @@ let self = ({
         let Notfound = 0
         Order.find({}, function (err, orders) {
             _.forEach(orders, (item, k) => {
-                self.checkOrder(req,item,k);
+                self.checkOrder(req, item, k);
             })
         })
     },

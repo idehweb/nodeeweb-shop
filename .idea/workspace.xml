@@ -4,11 +4,7 @@
     <list default="true" id="49bb18a3-8663-4ba3-b14f-a7999451c504" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/order/controller.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/order/controller.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/product/controller.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/product/controller.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transaction/controller.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/transaction/controller.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transaction/index.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/transaction/index.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transaction/routes.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/transaction/routes.mjs" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -19,11 +15,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="controller.mjs" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/order/controller.mjs">
+      <file leaf-file-name="controller.mjs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/product/controller.mjs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="337">
-              <caret line="1499" column="47" lean-forward="true" selection-start-line="1499" selection-start-column="47" selection-end-line="1499" selection-end-column="47" />
+            <state relative-caret-position="170">
+              <caret line="15" selection-start-line="15" selection-end-line="16" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
               </folding>
@@ -31,20 +27,23 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="package.json" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/package.json">
+      <file leaf-file-name="controller.mjs" pinned="true" current-in-tab="true">
+        <entry file="remoteDeploymentFS://&lt;ce39571c-90df-4e04-b94e-47ff272b5444&gt;/home/nodeeweb_modules/node_modules/@nodeeweb/shop/product/controller.mjs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="189">
-              <caret line="7" column="22" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
+            <state relative-caret-position="121">
+              <caret line="15" column="45" selection-start-line="15" selection-start-column="45" selection-end-line="15" selection-end-column="45" />
+              <folding>
+                <element signature="e#0#22#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="routes.mjs" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/order/routes.mjs">
+      <file leaf-file-name="updateserver.sh" pinned="true" current-in-tab="false">
+        <entry file="remoteDeploymentFS://&lt;ce39571c-90df-4e04-b94e-47ff272b5444&gt;/root/updateserver.sh">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1674">
-              <caret line="62" selection-start-line="62" selection-end-line="69" selection-end-column="6" />
+            <state relative-caret-position="115">
+              <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
             </state>
           </provider>
         </entry>
@@ -62,18 +61,12 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>allW</find>
-      <find>مغایرت در مو</find>
-      <find>createByCustomer</find>
-      <find>desc</find>
-      <find>rew</find>
       <find>item</find>
       <find>rewriteProducts</find>
       <find>allWOrders</find>
       <find>viewOne</find>
       <find>editByA</find>
       <find>telegram</find>
-      <find>discount</find>
       <find>sku</find>
       <find>meta</find>
       <find>creating order successfully:</find>
@@ -92,6 +85,12 @@
       <find>sendReq</find>
       <find>checkOrder</find>
       <find>k</find>
+      <find>subtotal</find>
+      <find>disco</find>
+      <find>display_value</find>
+      <find>getAll</find>
+      <find>discount</find>
+      <find>sort</find>
     </findStrings>
     <replaceStrings>
       <replace>300088103373</replace>
@@ -147,11 +146,9 @@
         <option value="&lt;03e84c5a-b1e8-40fe-8f2e-8ab7a9f7d778&gt;/root/updateserver.sh" />
         <option value="$PROJECT_DIR$/attributes/controller.mjs" />
         <option value="&lt;ce39571c-90df-4e04-b94e-47ff272b5444&gt;/home/nodeeweb_modules/node_modules/@nodeeweb/shop/attributes/controller.mjs" />
-        <option value="&lt;ce39571c-90df-4e04-b94e-47ff272b5444&gt;/home/nodeeweb_modules/node_modules/@nodeeweb/shop/product/controller.mjs" />
         <option value="&lt;ce39571c-90df-4e04-b94e-47ff272b5444&gt;/home/admin/domains/felafel.cafe/public_html/plugins/zoomiroom-gateway/index.js" />
         <option value="&lt;ce39571c-90df-4e04-b94e-47ff272b5444&gt;/home/cinemachoo/domains/cinemachoob.shop/public_html/plugins/zibal-gateway/index.js" />
         <option value="&lt;ce39571c-90df-4e04-b94e-47ff272b5444&gt;/home/admin/domains/idehweb.com/public_html/worker/script/updateserver.sh" />
-        <option value="&lt;ce39571c-90df-4e04-b94e-47ff272b5444&gt;/root/updateserver.sh" />
         <option value="&lt;ce39571c-90df-4e04-b94e-47ff272b5444&gt;/home/arvand/domains/arvandguarantee.shop/public_html/main/src/app/configHandle.mjs" />
         <option value="&lt;ce39571c-90df-4e04-b94e-47ff272b5444&gt;/home/arvand/domains/arvandguarantee.shop/public_html/main/src/controllers/product.mjs" />
         <option value="&lt;ce39571c-90df-4e04-b94e-47ff272b5444&gt;/home/arvand/domains/arvandguarantee.shop/public_html/main/src/controllers/category.mjs" />
@@ -171,10 +168,12 @@
         <option value="$PROJECT_DIR$/transaction/routes.mjs" />
         <option value="$PROJECT_DIR$/transaction/controller.mjs" />
         <option value="$PROJECT_DIR$/transaction/index.mjs" />
-        <option value="$PROJECT_DIR$/product/controller.mjs" />
-        <option value="&lt;ce39571c-90df-4e04-b94e-47ff272b5444&gt;/home/nodeeweb_modules/node_modules/@nodeeweb/shop/order/controller.mjs" />
         <option value="$PROJECT_DIR$/package.json" />
+        <option value="&lt;ce39571c-90df-4e04-b94e-47ff272b5444&gt;/root/updateserver.sh" />
         <option value="$PROJECT_DIR$/order/controller.mjs" />
+        <option value="&lt;ce39571c-90df-4e04-b94e-47ff272b5444&gt;/home/nodeeweb_modules/node_modules/@nodeeweb/shop/order/controller.mjs" />
+        <option value="$PROJECT_DIR$/product/controller.mjs" />
+        <option value="&lt;ce39571c-90df-4e04-b94e-47ff272b5444&gt;/home/nodeeweb_modules/node_modules/@nodeeweb/shop/product/controller.mjs" />
       </list>
     </option>
   </component>
@@ -192,7 +191,7 @@
       <path value="$PROJECT_DIR$/package.json" />
     </packageJsonPaths>
   </component>
-  <component name="ProjectFrameBounds" fullScreen="true">
+  <component name="ProjectFrameBounds" extendedState="6" fullScreen="true">
     <option name="width" value="1680" />
     <option name="height" value="1050" />
   </component>
@@ -202,7 +201,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -255,6 +253,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -397,24 +396,26 @@
       <workItem from="1676569599497" duration="440000" />
       <workItem from="1676714253744" duration="3868000" />
       <workItem from="1676744305641" duration="3193000" />
-      <workItem from="1676883121026" duration="459000" />
+      <workItem from="1676883121026" duration="2516000" />
+      <workItem from="1676886179082" duration="1600000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="422431000" />
+    <option name="totallyTimeSpent" value="426088000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Run" order="2" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="7" visible="true" weight="0.37184873" />
-      <window_info anchor="right" id="Remote Host" order="3" weight="0.24542125" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.35286936" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="7" visible="true" weight="0.38655463" />
+      <window_info anchor="right" id="Remote Host" order="3" visible="true" weight="0.24542125" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25885227" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -431,6 +432,7 @@
       <window_info anchor="bottom" id="Find" order="1" />
     </layout>
     <layout-to-restore>
+      <window_info anchor="bottom" id="Version Control" order="11" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -442,16 +444,15 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="TypeScript" order="12" />
       <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="right" id="Database" order="4" />
       <window_info anchor="bottom" id="Terminal" order="9" visible="true" weight="0.39180672" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="11" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="File Transfer" order="13" weight="0.32983193" />
-      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
       <window_info id="Favorites" order="2" side_tool="true" />
     </layout-to-restore>
   </component>
@@ -678,13 +679,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/order/model.mjs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1566">
-          <caret line="58" column="26" selection-start-line="58" selection-start-column="26" selection-end-line="58" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/product/controller_backup.mjs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="425">
@@ -743,27 +737,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/product/routes.mjs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1755">
-          <caret line="65" column="44" selection-start-line="65" selection-start-column="33" selection-end-line="65" selection-end-column="44" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/product/model.mjs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1269">
           <caret line="47" column="52" selection-start-line="47" selection-start-column="42" selection-end-line="47" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/product/controller.mjs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="275" column="40" selection-start-line="275" selection-start-column="40" selection-end-line="275" selection-end-column="40" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -774,17 +751,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/transaction/index.mjs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-31">
-          <caret line="30" column="49" lean-forward="true" selection-start-line="30" selection-start-column="49" selection-end-line="30" selection-end-column="49" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/order/routes.mjs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1674">
           <caret line="62" selection-start-line="62" selection-end-line="69" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transaction/index.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="27">
+          <caret line="30" column="49" lean-forward="true" selection-start-line="30" selection-start-column="49" selection-end-line="30" selection-end-column="49" />
         </state>
       </provider>
     </entry>
@@ -795,10 +772,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/order/model.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="207">
+          <caret line="54" column="7" selection-start-line="54" selection-start-column="7" selection-end-line="54" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/order/controller.mjs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="337">
-          <caret line="1499" column="47" lean-forward="true" selection-start-line="1499" selection-start-column="47" selection-end-line="1499" selection-end-column="47" />
+        <state relative-caret-position="123">
+          <caret line="1628" column="17" selection-start-line="1628" selection-start-column="17" selection-end-line="1628" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/product/routes.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="897">
+          <caret line="59" column="54" lean-forward="true" selection-start-line="59" selection-start-column="54" selection-end-line="59" selection-end-column="54" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/product/controller.mjs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="15" selection-start-line="15" selection-end-line="16" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
           </folding>
