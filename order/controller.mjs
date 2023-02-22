@@ -1057,7 +1057,7 @@ let self = ({
         // console.log('hgfgh');
         let obj = {
             _id: req.params.id,
-            customer: req.headers.customer_id.toString(),
+            customer: req.headers._id.toString(),
         }
         console.log('obj', obj)
         Order.findOne(obj,

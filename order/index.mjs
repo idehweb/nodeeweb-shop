@@ -31,9 +31,8 @@ export default {
         "func": (req, res, next) => {
         }
     }],
-    "edits": [{
-        "func": (req, res, next) => {
-        }
+    "events": [{
+        "name": "create-order-by-customer"
     }],
 
 }

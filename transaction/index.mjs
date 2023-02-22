@@ -36,6 +36,9 @@ export default {
         "func": (req, res, next) => {
         }
     }],
+    "events": [{
+        "name": "update-transaction-by-customer"
+    }],
     "req": {
         "updateTransaction": (req, res, next,transactionObject) => {
             console.log('let us update_transaction req');
@@ -88,6 +91,9 @@ export default {
 
                     }
                     console.log('end of buy...');
+
+                    req.fireEvent('update-transaction-by-customer', transaction);
+
                     let respon = {
                         success: transactionObject['status'],
                         orderNumber: updated_order.orderNumber

@@ -51,13 +51,13 @@ export default [
     {
         "path": "/myOrders/onlyMine/:id",
         "method": "get",
-        "access": "admin_user,admin_shopManager,customer_all",
+        "access": "admin_user,admin_shopManager,customer_user",
         "controller": controller.myOrder,
     },
     {
         "path": "/myOrders/mine/:offset/:limit",
         "method": "get",
-        "access": "admin_user,admin_shopManager,customer_all",
+        "access": "admin_user,admin_shopManager,customer_user",
         "controller": controller.allWOrders,
     },
 
