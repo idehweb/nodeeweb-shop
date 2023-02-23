@@ -70,172 +70,186 @@ var self = ({
                 success: false,
                 message: "req.params._price"
             });
-        if (req.body.method)
-            Gateway.findOne({slug: req.body.method}, function (err, gateway) {
-                if (!gateway || !gateway.request) {
-                    return res.json({
-                        success: false,
-                        slug: req.body.method,
-                        // gateway: gateway,
-                        message: "gateway request not found"
-                    })
-                }
+        Settings.findOne({},"currency", function (err, setting) {
+// let currency
+            if (req.body.method)
+                Gateway.findOne({slug: req.body.method}, function (err, gateway) {
+                    if (!gateway || !gateway.request) {
+                        return res.json({
+                            success: false,
+                            slug: req.body.method,
+                            // gateway: gateway,
+                            message: "gateway request not found"
+                        })
+                    }
 
 
-                Order.findById(req.params._id, "sum , orderNumber , amount , discount , customer",
-                    function (err, order) {
-                        if (err || !order) {
-                            res.json({
-                                success: false,
-                                message: "error!"
-                            });
-                            return 0;
-                        }
+                    Order.findById(req.params._id, "sum , orderNumber , amount , discount , customer",
+                        function (err, order) {
+                            if (err || !order) {
+                                res.json({
+                                    success: false,
+                                    message: "error!"
+                                });
+                                return 0;
+                            }
 
-                        // obj[]=;
+                            // obj[]=;
 // console.log(order.amount/);
 //                 return;
-                        let amount = parseInt(order.amount) * 10;
-                        if (req.params._price) {
-                            amount = parseInt(req.params._price) * 10;
-                        }
-                        if (order.discount) {
-                            amount = amount - (order.discount * 10);
-                        }
-                        if (amount < 0) {
-                            amount = 0;
-                        }
-                        if (amount > 500000000) {
-                            return res.json({
-                                success: false,
-                                message: "price is more than 50,000,000T"
-                            });
-                        }
-                        //check if we have method or not,
-                        // for both we have to create transaction
-                        //    if we have method, submit method too
-                        console.log('order.orderNumber', order.orderNumber)
-                        gateway.request = gateway.request.replaceAll("%domain%", process.env.BASE_URL);
-
-
-                        gateway.request = gateway.request.replaceAll("%amount%", order.amount);
-
-
-                        gateway.request = gateway.request.split("%orderNumber%").join(order.orderNumber);
-                        // gateway.request = gateway.request.replace("%orderNumber%", order.orderNumber);
-                        gateway.request = gateway.request.replaceAll("%orderId%", order._id);
-                        console.log('gateway.request', gateway.request);
-                        if (!JSON.parse(gateway.request))
-                            return res.json({
-                                success: false,
-                                gateway: JSON.parse(gateway.request),
-                                message: "gateway request not found"
-                            })
-                        // let sendrequest=
-                        var theReq = JSON.parse(gateway.request);
-                        console.log('theReq[\'amount\']', theReq['data'])
-
-                        if (theReq['data'] && theReq['data']['Amount'])
-                            theReq['data']['Amount'] = stringMath(theReq['data']['Amount'].toString())
-
-                        if (theReq['data'] && theReq['data']['amount'])
-                            theReq['data']['amount'] = stringMath(theReq['data']['amount'].toString())
-
-                        if (theReq['body'] && theReq['body']['Amount'])
-                            theReq['body']['Amount'] = stringMath(theReq['body']['Amount'].toString())
-
-                        if (theReq['body'] && theReq['body']['amount'])
-                            theReq['body']['amount'] = stringMath(theReq['body']['amount'].toString())
-                        console.log('gateway.request', theReq)
-
-                        // return;
-                        req.httpRequest(theReq).then(function (parsedBody) {
-
-                            let obj = {
-                                "amount": amount,
-                                "method": req.body.method,
-                                "order": req.params._id,
-                                "gatewayResponse": JSON.stringify(parsedBody["data"]),
-                                "Authority": parsedBody["data"]["trackId"]
-                            };
-                            if (req.headers && req.headers.customer && req.headers.customer._id) {
-                                obj["customer"] = req.headers.customer._id;
-                            }
-                            // return res.json({
-                            //     ...obj, gateway: JSON.parse(gateway.request),
-                            // });
-                            let notif = "paying ";
-                            if(order.amount){
-                                notif+=order.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                            }
-                            notif += "\nfor order: " + order.orderNumber;
-                            if (order.customer.phoneNumber)
-                                notif += "\nphoneNumber:" + order.customer.phoneNumber;
-                            if (order.customer.firstName)
-                                notif += "\nname:" + order.customer.firstName;
-                            if (order.customer.lastName)
-                                notif += " " + order.customer.lastName + "\n";
-
-                            // console.log('notif',notif);
-                            // req.publishToTelegram(notif)
-                            // return;
-                            req.fireEvent('create-transaction-by-customer', order);
-
-                            Transaction.create(obj, function (err, transaction) {
-                                if (err || !transaction) {
-                                    return res.json({
-                                        success: false,
-                                        message: "transaction could not be created",
-                                        err: err
-                                    })
+                            let mn=1;
+                            if(setting.currency){
+                                if(setting.currency=='toman'){
+                                    mn=10
                                 }
-                                Order.findByIdAndUpdate(req.params._id, {
-                                    $push: {
-                                        transaction: transaction._id
-                                    }
-                                }, function (order_err, updated_order) {
-                                    console.log('end of buy...');
-                                    if (parsedBody['data'] && parsedBody['data']['url']) {
-                                        return res.json({
-                                            success: true,
-                                            url: parsedBody['data']['url']
-                                        });
-                                    }
-                                    if (parsedBody['data'] && parsedBody['data'].trackId) {
+                            }
+                            let amount = parseInt(order.amount) * mn;
+                            if (req.params._price) {
+                                amount = parseInt(req.params._price) * mn;
+                            }
+                            if (order.discount) {
+                                amount = amount - (order.discount * mn);
+                            }
+                            if (amount < 0) {
+                                amount = 0;
+                            }
+                            if (amount > 500000000) {
+                                return res.json({
+                                    success: false,
+                                    message: "price is more than 50,000,000T"
+                                });
+                            }
+                            //check if we have method or not,
+                            // for both we have to create transaction
+                            //    if we have method, submit method too
+                            console.log('order.orderNumber', order.orderNumber)
+                            gateway.request = gateway.request.replaceAll("%domain%", process.env.BASE_URL);
 
-                                        return res.json({
-                                            success: true,
-                                            // data: parsedBody['data'],
-                                            // request: JSON.parse(gateway.request),
-                                            url: "https://gateway.zibal.ir/start/" + parsedBody['data'].trackId
-                                        });
-                                    } else {
+
+                            gateway.request = gateway.request.replaceAll("%amount%", order.amount);
+
+
+                            gateway.request = gateway.request.split("%orderNumber%").join(order.orderNumber);
+                            // gateway.request = gateway.request.replace("%orderNumber%", order.orderNumber);
+                            gateway.request = gateway.request.replaceAll("%orderId%", order._id);
+                            console.log('gateway.request', gateway.request);
+                            if (!JSON.parse(gateway.request))
+                                return res.json({
+                                    success: false,
+                                    gateway: JSON.parse(gateway.request),
+                                    message: "gateway request not found"
+                                })
+                            // let sendrequest=
+                            var theReq = JSON.parse(gateway.request);
+                            console.log('theReq[\'amount\']', theReq['data'])
+
+                            if (theReq['data'] && theReq['data']['Amount'])
+                                theReq['data']['Amount'] = stringMath(theReq['data']['Amount'].toString())
+
+                            if (theReq['data'] && theReq['data']['amount'])
+                                theReq['data']['amount'] = stringMath(theReq['data']['amount'].toString())
+
+                            if (theReq['body'] && theReq['body']['Amount'])
+                                theReq['body']['Amount'] = stringMath(theReq['body']['Amount'].toString())
+
+                            if (theReq['body'] && theReq['body']['amount'])
+                                theReq['body']['amount'] = stringMath(theReq['body']['amount'].toString())
+                            console.log('gateway.request', theReq)
+
+                            // return;
+                            req.httpRequest(theReq).then(function (parsedBody) {
+                                if(setting.currency){
+                                    if(setting.currency=='toman'){
+                                        mn=10
+                                    }
+                                }
+                                let obj = {
+                                    "amount": parseInt(amount/mn),
+                                    "method": req.body.method,
+                                    "order": req.params._id,
+                                    "gatewayResponse": JSON.stringify(parsedBody["data"]),
+                                    "Authority": parsedBody["data"]["trackId"]
+                                };
+                                if (req.headers && req.headers.customer && req.headers.customer._id) {
+                                    obj["customer"] = req.headers.customer._id;
+                                }
+                                // return res.json({
+                                //     ...obj, gateway: JSON.parse(gateway.request),
+                                // });
+                                let notif = "paying ";
+                                if (order.amount) {
+                                    notif += order.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                }
+                                notif += "\nfor order: " + order.orderNumber;
+                                if (order.customer.phoneNumber)
+                                    notif += "\nphoneNumber:" + order.customer.phoneNumber;
+                                if (order.customer.firstName)
+                                    notif += "\nname:" + order.customer.firstName;
+                                if (order.customer.lastName)
+                                    notif += " " + order.customer.lastName + "\n";
+
+                                // console.log('notif',notif);
+                                // req.publishToTelegram(notif)
+                                // return;
+
+                                Transaction.create(obj, function (err, transaction) {
+                                    if (err || !transaction) {
                                         return res.json({
                                             success: false,
-                                            // data: parsedBody['data'],
-                                            // request: JSON.parse(gateway.request),
-                                            parsedBody: parsedBody['data']
-                                        });
+                                            message: "transaction could not be created",
+                                            err: err
+                                        })
                                     }
+                                    req.fireEvent('create-transaction-by-customer', transaction);
+
+                                    Order.findByIdAndUpdate(req.params._id, {
+                                        $push: {
+                                            transaction: transaction._id
+                                        }
+                                    }, function (order_err, updated_order) {
+                                        console.log('end of buy...');
+                                        if (parsedBody['data'] && parsedBody['data']['url']) {
+                                            return res.json({
+                                                success: true,
+                                                url: parsedBody['data']['url']
+                                            });
+                                        }
+                                        if (parsedBody['data'] && parsedBody['data'].trackId) {
+
+                                            return res.json({
+                                                success: true,
+                                                // data: parsedBody['data'],
+                                                // request: JSON.parse(gateway.request),
+                                                url: "https://gateway.zibal.ir/start/" + parsedBody['data'].trackId
+                                            });
+                                        } else {
+                                            return res.json({
+                                                success: false,
+                                                // data: parsedBody['data'],
+                                                // request: JSON.parse(gateway.request),
+                                                parsedBody: parsedBody['data']
+                                            });
+                                        }
+                                    });
                                 });
-                            });
 
-                        }).catch(e => {
-                            // req.publishToTelegram('error creating transaction! please check...' + "\nfor order:" + order.orderNumber + "\namount:" + order.amount)
+                            }).catch(e => {
+                                // req.publishToTelegram('error creating transaction! please check...' + "\nfor order:" + order.orderNumber + "\namount:" + order.amount)
 
-                            res.json({e, requ: theReq})
+                                res.json({e, requ: theReq})
 
-                        })
+                            })
 
 
-                    }).populate("customer", "_id phoneNumber firstName lastName");
-            })
-        else {
-            return res.json({
-                success: false,
-                message: "you have no gateway"
-            })
-        }
+                        }).populate("customer", "_id phoneNumber firstName lastName");
+                })
+            else {
+                return res.json({
+                    success: false,
+                    message: "you have no gateway"
+                })
+            }
+        });
         // req.global.getSetting("ZIBAL_TOKEN").then((merchant) => {
         //     console.log('merchant', merchant)
 

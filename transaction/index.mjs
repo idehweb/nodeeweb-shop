@@ -17,7 +17,7 @@ export default {
                 {"name": "statusCode","type":"string"},
                 {"name": "createdAt","type":"date"},
                 {"name": "updatedAt","type":"date"}
-                ]
+            ]
         },
         "create": {
             "fields": [{"name": "title", "type": "string"},]
@@ -40,15 +40,16 @@ export default {
         "name": "update-transaction-by-customer"
     }],
     "req": {
-        "updateTransaction": (req, res, next,transactionObject) => {
+        "updateTransaction": (req, res, next,transactionObject,orderObject={},transactionFind={"Authority": req.body.iN + req.body.iD}) => {
             console.log('let us update_transaction req');
             let Transaction = req.mongoose.model('Transaction');
             let Order = req.mongoose.model('Order');
+            let Product = req.mongoose.model('Product');
             console.log('transactionObject', transactionObject);
-            Transaction.findOneAndUpdate({"Authority": req.body.iN + req.body.iD}, {
+            Transaction.findOneAndUpdate(transactionFind, {
                 $set: transactionObject
 
-            }, function (err, transaction) {
+            },{new:true}, function (err, transaction) {
                 if (err || !transaction) {
                     return res.json({
                         success: false,
@@ -92,7 +93,7 @@ export default {
                     }
                     console.log('end of buy...');
 
-                    req.fireEvent('update-transaction-by-customer', transaction);
+                    req.fireEvent('update-transaction-by-customer', {...transaction,orderNumber: updated_order.orderNumber,customer_data: updated_order.customer_data});
 
                     let respon = {
                         success: transactionObject['status'],
@@ -101,7 +102,7 @@ export default {
 
                     return res.json(respon);
                 })
-            });
+            }).lean();
         }
     },
 
