@@ -12,6 +12,8 @@ import crypto from 'crypto';
 
 var self = ({
     all: function (req, res, next) {
+        let LIMIT=1000000000
+
         let Transaction = req.mongoose.model('Transaction');
 
         let offset = 0;
@@ -58,6 +60,8 @@ var self = ({
         }).limit(parseInt(req.params.limit));
     },
     buy: function (req, res, next) {
+        let LIMIT=1000000000
+
         let Order = req.mongoose.model('Order');
         let Product = req.mongoose.model('Product');
         let Transaction = req.mongoose.model('Transaction');
@@ -256,6 +260,8 @@ var self = ({
         // }).catch(e => res.json(e))
     },
     create: function (req, res, next) {
+        let LIMIT=1000000000
+
         console.log('creating transaction by admin...');
         // req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
 
@@ -314,7 +320,7 @@ var self = ({
                         if (amount < 0) {
                             amount = 0;
                         }
-                        if (amount > 500000000) {
+                        if (amount > LIMIT) {
                             return res.json({
                                 success: false,
                                 message: "price is more than 50,000,000T"

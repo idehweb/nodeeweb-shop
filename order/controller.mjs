@@ -1134,7 +1134,8 @@ let self = ({
                         if (amount < 0) {
                             amount = 0;
                         }
-                        if (amount > 500000000) {
+                        let LIMIT=1000000000
+                        if (amount > LIMIT) {
                             return res.json({
                                 success: false,
                                 message: "price is more than 50,000,000T"
