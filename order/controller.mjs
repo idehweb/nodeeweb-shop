@@ -126,7 +126,7 @@ let self = ({
         let f = [];
 
         console.log('search', search);
-        Order.find(search, '_id , orderNumber , customer_data , customer , sum , amount , paymentStatus , status , createdAt , updatedAt', function (err, orders) {
+        Order.find(search, '_id , orderNumber , customer_data , customer , sum , amount , paymentStatus , status , createdAt , updatedAt , card', function (err, orders) {
             if (err || !orders) {
                 console.log('err', err);
                 res.json([]);

@@ -264,7 +264,7 @@ let self = ({
             }
         }
         if (req.body.type == 'normal') {
-            // delete req.body.options;
+            delete req.body.options;
             delete req.body.combinations;
         }
         if (req.body.like) {

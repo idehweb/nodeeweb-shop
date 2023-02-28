@@ -175,8 +175,11 @@ Nodeeweb is licensed under the GNU GENERAL PUBLIC LICENSE, sponsored and support
 
 ## Changelogs
 
+== 0.0.386
+    * add top sale parts
+
 == 0.0.385
-    * add buy price limir
+    * add buy price limit
 
 == 0.0.383
     * add transaction event
