@@ -277,8 +277,8 @@ let self = ({
         }
         req.body.updatedAt = new Date();
 
-        Product.findByIdAndUpdate(req.params.id, req.body, {new: true}, function (err, menu) {
-            if (err || !menu) {
+        Product.findByIdAndUpdate(req.params.id, req.body, {new: true}, function (err, product) {
+            if (err || !product) {
                 res.json({
                     success: false,
                     message: 'error!',
@@ -286,8 +286,20 @@ let self = ({
                 });
                 return 0;
             }
+            if (req.headers._id && req.headers.token) {
+                delete req.body.views;
+                // delete req.body.views;
+                let action = {
+                    user: req.headers._id,
+                    title: "edit product " + product._id,
+                    data: product,
+                    history: req.body,
+                    product: product._id
+                };
+                req.submitAction(action);
+            }
 
-            res.json(menu);
+            res.json(product);
             return 0;
 
         });
@@ -912,6 +924,41 @@ let self = ({
 
             }).lean();
     },
+    destroy: function (req, res, next) {
+        let Product = req.mongoose.model('Product');
+
+        Product.findByIdAndUpdate(req.params.id,
+            {
+                $set: {
+                    status: "trash"
+                }
+            },
+            function (err, product) {
+                if (err || !product) {
+                    return res.json({
+                        success: false,
+                        message: 'error!'
+                    });
+                }
+                if (req.headers._id && req.headers.token) {
+                    let action = {
+                        user: req.headers._id,
+                        title: 'delete product ' + product._id,
+                        // data:order,
+                        history: product,
+                        product: product._id,
+                    };
+                    req.submitAction(action);
+                }
+                return res.json({
+                    success: true,
+                    message: 'Deleted!'
+                });
+
+
+            }
+        );
+    }
 
 
 });

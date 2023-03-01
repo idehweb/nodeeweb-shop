@@ -1,6 +1,6 @@
 {
   "name": "@nodeeweb/shop",
-  "version": "0.0.386",
+  "version": "0.0.387",
   "type": "module",
   "dependencies": {
     "dotenv": "^16.0.1",

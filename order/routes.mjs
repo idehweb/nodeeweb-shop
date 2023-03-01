@@ -89,5 +89,7 @@ export default [
         "path": "/:id",
         "method": "delete",
         "access": "admin_user,admin_shopManager",
+        "controller": controller.destroy,
+
     },
 ]

@@ -83,7 +83,8 @@ let self = ({
         }
 
         search['status'] = {
-            $nin: ['cart', 'checkout', ''],
+            $nin: ['cart', 'checkout', 'trash',''],
+
         };
         if (req.query['status'] && req.query['status'] != 'all') {
             if (!search['status']) {
@@ -1765,6 +1766,41 @@ let self = ({
             })
         })
     },
+    destroy: function (req, res, next) {
+        let Order = req.mongoose.model('Order');
+
+        Order.findByIdAndUpdate(req.params.id,
+            {
+                $set: {
+                    status: "trash"
+                }
+            },
+            function (err, order) {
+                if (err || !order) {
+                    return res.json({
+                        success: false,
+                        message: 'error!'
+                    });
+                }
+                if (req.headers._id && req.headers.token) {
+                    let action = {
+                        user: req.headers._id,
+                        title: 'delete order ' + order._id,
+                        // data:order,
+                        history: order,
+                        order: order._id,
+                    };
+                    req.submitAction(action);
+                }
+                return res.json({
+                    success: true,
+                    message: 'Deleted!'
+                });
+
+
+            }
+        );
+    }
 
 
 });
