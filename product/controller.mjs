@@ -13,7 +13,7 @@ let self = ({
             return res.show()
 
         }
-        let sort = {updatedAt: -1, in_stock: -1}
+        let sort = { in_stock: -1,updatedAt: -1}
 
         console.log('==> getAll()', Product);
         let offset = 0;
