@@ -172,7 +172,7 @@ var self = ({
                                     "method": req.body.method,
                                     "order": req.params._id,
                                     "gatewayResponse": JSON.stringify(parsedBody["data"]),
-                                    "Authority": parsedBody["data"]["trackId"]
+                                    "Authority": parsedBody["data"]["trackId"] || parsedBody["data"]["Authority"]
                                 };
                                 if (req.headers && req.headers.customer && req.headers.customer._id) {
                                     obj["customer"] = req.headers.customer._id;

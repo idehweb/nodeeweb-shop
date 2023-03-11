@@ -215,8 +215,8 @@ let self = ({
             // delete req.body.options;
             delete req.body.combinations;
         }
-        Product.create(req.body, function (err, menu) {
-            if (err || !menu) {
+        Product.create(req.body, function (err, product) {
+            if (err || !product) {
                 res.json({
                     err: err,
                     success: false,
@@ -224,7 +224,20 @@ let self = ({
                 });
                 return 0;
             }
-            res.json(menu);
+
+            if (req.headers._id && req.headers.token) {
+                delete req.body.views;
+                let action = {
+                    user: req.headers._id,
+                    title: "create product " + product._id,
+                    action: "create-product",
+                    data: product,
+                    history: req.body,
+                    product: product._id
+                };
+                req.submitAction(action);
+            }
+            res.json(product);
             return 0;
 
         });
@@ -292,6 +305,7 @@ let self = ({
                 let action = {
                     user: req.headers._id,
                     title: "edit product " + product._id,
+                    action: "edit-product",
                     data: product,
                     history: req.body,
                     product: product._id
@@ -945,6 +959,8 @@ let self = ({
                         user: req.headers._id,
                         title: 'delete product ' + product._id,
                         // data:order,
+                        action: "delete-product",
+
                         history: product,
                         product: product._id,
                     };
