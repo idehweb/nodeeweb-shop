@@ -15,7 +15,7 @@ let self = ({
         }
         let sort = { in_stock: -1,updatedAt: -1}
 
-        console.log('==> getAll()', Product);
+        console.log('getAll()');
         let offset = 0;
         if (req.params.offset) {
             offset = parseInt(req.params.offset);
@@ -51,8 +51,9 @@ let self = ({
         }
         if (req.query && req.query.status) {
             search = {...search, status: req.query.status}
-            console.log('****************req.query', req.query);
+            // console.log('****************req.query', req.query);
         }
+
         // return res.json(Product.schema.paths);
         // console.log("Product.schema => ",Product.schema.paths);
         // console.log(Object.keys(req.query));
@@ -73,7 +74,7 @@ let self = ({
 
             }
             else {
-                console.log("filter doesnot exist => ", item);
+                // console.log("filter doesnot exist => ", item);
             }
         });
         // console.log('search', search);
@@ -81,21 +82,21 @@ let self = ({
 
         function isStringified(jsonValue) { // use this function to check
             try {
-                console.log("need to parse");
+                // console.log("need to parse");
                 return JSON.parse(jsonValue);
             } catch (err) {
-                console.log("not need to parse");
+                // console.log("not need o parse");
 
                 return jsonValue;
             }
         }
 
-        console.log('req.query.filter', req.query.filter)
+        // console.log('req.query.filter', req.query.filter)
         if (req.query.filter) {
             const json = isStringified(req.query.filter);
 
             if (typeof json == "object") {
-                console.log("string is a valid json");
+                // console.log("string is a valid json");
                 thef = JSON.parse(req.query.filter);
                 if (thef.search) {
 
@@ -113,7 +114,7 @@ let self = ({
             //     thef = JSON.parse(req.query.filter);
             // }
         }
-        console.log('thef', thef);
+        // console.log('thef', thef);
         if (thef && thef != '')
             search = thef;
         // console.log(req.mongoose.Schema(Product))
@@ -121,11 +122,11 @@ let self = ({
         if (search['productCategory.slug']) {
             let ProductCategory = req.mongoose.model('ProductCategory');
 
-            console.log('search[\'productCategory.slug\']', search['productCategory.slug'])
+            // console.log('search[\'productCategory.slug\']', search['productCategory.slug'])
 
             ProductCategory.findOne({slug: search['productCategory.slug']}, function (err, productcategory) {
-                console.log('err', err)
-                console.log('req', productcategory)
+                // console.log('err', err)
+                // console.log('req', productcategory)
                 if (err || !productcategory)
                     return res.json([]);
                 if (productcategory._id) {
@@ -159,19 +160,19 @@ let self = ({
             });
             // console.log('q', q)
         } else {
-            console.log('no \'productCategory.slug\'')
+            // console.log('no \'productCategory.slug\'')
             if (!search['status'])
                 search['status'] = 'published'
-            console.log('search q.exec', search)
+            // console.log('search q.exec', search)
 
             q = Product.find(search, fields).populate('productCategory', '_id slug').skip(offset).sort(sort).limit(parseInt(req.params.limit));
             q.exec(function (err, model) {
 
-                console.log('err', err)
+                // console.log('err', err)
                 if (err || !model)
                     return res.json([]);
                 Product.countDocuments(search, function (err, count) {
-                    console.log('countDocuments', count, model ? model.length : '');
+                    // console.log('countDocuments', count, model ? model.length : '');
                     if (err || !count) {
                         res.json([]);
                         return 0;
@@ -337,7 +338,7 @@ let self = ({
         if (req.query.page) {
             url += '&page=' + req.query.page;
         }
-        console.log('importFromWordpress', url);
+        // console.log('importFromWordpress', url);
         let count = 0;
         req.httpRequest({
             method: "get",
@@ -391,7 +392,7 @@ let self = ({
         if (req.query.page) {
             url += '&page=' + req.query.page;
         }
-        console.log('importFromWordpress', url);
+        // console.log('importFromWordpress', url);
         let count = 0;
         req.httpRequest({
             method: "get",
@@ -467,7 +468,7 @@ let self = ({
                     // }
                     Product.findByIdAndUpdate(item._id, item, function (err, pro) {
                         p++;
-                        console.log('p: ', p, ' products.length:', products.length)
+                        // console.log('p: ', p, ' products.length:', products.length)
                         if (p == products.length) {
                             return res.json({
                                 success: true
@@ -481,7 +482,7 @@ let self = ({
     },
 
     torob: function (req, res, next) {
-        console.log("it is Torob!");
+        console.log("----- torob -----");
         let offset = 0;
         if (req.params.offset) {
             offset = parseInt(req.params.offset);
@@ -497,7 +498,7 @@ let self = ({
         Settings.findOne({}, "tax taxAmount", function (err, setting) {
             Product.find({}, "_id title price type salePrice in_stock combinations firstCategory secondCategory thirdCategory slug", function (err, products) {
                 // console.log('err', err)
-                console.log('products', products)
+                // console.log('products', products)
                 if (err || !products) {
                     return res.json([]);
                 }
@@ -507,7 +508,7 @@ let self = ({
                     t.map((item) => (item != 0) ? arr.push(item) : false);
                     if (arr && arr.length > 0)
                         return arr.reduce(function (p, v) {
-                            console.log("p", p, "v", v);
+                            // console.log("p", p, "v", v);
                             return (p < v ? p : v);
                         });
                     else
@@ -554,10 +555,10 @@ let self = ({
                     }
                     last_price = arrayMin(price_array);
                     last_sale_price = arrayMin(sale_array);
-                    console.log("last price", last_price, last_sale_price);
+                    // console.log("last price", last_price, last_sale_price);
 
                     if ((last_price !== false && last_sale_price !== false) && (last_price < last_sale_price)) {
-                        console.log("we have got here");
+                        // console.log("we have got here");
                         var cd = price_array.indexOf(last_price);
                         if (sale_array[cd] && sale_array[cd] != 0)
                             last_sale_price = sale_array[cd];
@@ -568,7 +569,7 @@ let self = ({
                         // }
 
                     } else if ((last_price !== false && last_sale_price !== false) && (last_price > last_sale_price)) {
-                        console.log("we have got there");
+                        // console.log("we have got there");
 
                         // last_price = last_sale_price;
                         // last_sale_price = tem;
@@ -602,7 +603,7 @@ let self = ({
                         if (c.price && c.price != null)
                             price_array.push(c.price);
                     }
-                    console.log("price_stock", price_stock);
+                    // console.log("price_stock", price_stock);
 
 
                     let slug = c.slug;
@@ -613,7 +614,7 @@ let self = ({
                         cat_inLink = c.secondCategory.slug;
                     if (c.thirdCategory && c.thirdCategory.slug)
                         cat_inLink = c.thirdCategory.slug;
-                    console.log('tax', setting)
+                    // console.log('tax', setting)
                     if (setting.tax && setting.taxAmount) {
                         if (last_price) {
                             let n = (parseInt(setting.taxAmount) * last_price) / 100
@@ -668,7 +669,7 @@ let self = ({
                 if (item.photos) {
                     _.forEach((item.photos ? item.photos : []), async (c, cx) => {
                         let mainUrl = encodeURI(c);
-                        console.log('images[', cx, ']', mainUrl);
+                        // console.log('images[', cx, ']', mainUrl);
 
                         let filename =
                                 c.split('/').pop(),
@@ -679,8 +680,8 @@ let self = ({
                             mimtype = mime.getType(type),
                             filePath = path.join(__dirname, "./public_media/customer/", name),
                             fstream = fs.createWriteStream(filePath);
-                        console.log('name', filename)
-                        console.log('getting mainUrl', req.query.url + mainUrl);
+                        // console.log('name', filename)
+                        // console.log('getting mainUrl', req.query.url + mainUrl);
 
                         https.get(req.query.url + mainUrl, function (response) {
                             response.pipe(fstream);
@@ -729,9 +730,9 @@ let self = ({
         })
     },
     viewOneS: function (req, res, next) {
-        console.log("===> viewOneS() ");
+        console.log("----- viewOne -----");
         return new Promise(function (resolve, reject) {
-            console.log('req.params._id', req.params);
+            // console.log('req.params._id', req.params);
             const arrayMin = (arr) => {
                 if (arr && arr.length > 0)
                     return arr.reduce(function (p, v) {
@@ -804,7 +805,7 @@ let self = ({
                     // });
                     delete product.data;
                     delete product.transaction;
-                    console.log(" product", product);
+                    // console.log(" product", product);
                     let img = '';
                     if (product.photos && product.photos[0]) {
                         img = product.photos[0]
@@ -874,14 +875,14 @@ let self = ({
         }
 
         let obj = {};
-        console.log('req.params.id', req.params.id)
+        // console.log('req.params.id', req.params.id)
         if (isValidObjectId(req.params.id)) {
             obj["_id"] = req.params.id;
         } else {
             obj["slug"] = req.params.id;
 
         }
-        console.log('get product: ', obj)
+        // console.log('get product: ', obj)
         Product.findOne(obj,
             function (err, product) {
                 if (err || !product) {

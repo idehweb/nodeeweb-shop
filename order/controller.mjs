@@ -126,7 +126,10 @@ let self = ({
         }
         let f = [];
 
-        console.log('search', search);
+        if(req.query['orderNumber']){
+            search['orderNumber']=req.query['orderNumber']
+        }
+        // console.log('search', search);
         Order.find(search, '_id , orderNumber , customer_data , customer , sum , amount , paymentStatus , status , createdAt , updatedAt , card', function (err, orders) {
             if (err || !orders) {
                 console.log('err', err);
@@ -137,7 +140,7 @@ let self = ({
             // console.log('orders', orders);
             delete search['$or'];
             Order.countDocuments(search, function (err, count) {
-                console.log('countDocuments', count, err);
+                // console.log('countDocuments', count, err);
                 if (err || !count) {
                     res.json([]);
                     return 0;
@@ -147,7 +150,7 @@ let self = ({
                     count,
                 );
                 _.forEach(orders, (item, i) => {
-                    console.log('item._id', item._id, item.customer)
+                    // console.log('item._id', item._id, item.customer)
                     if (item.customer && item.customer._id) {
                         let sObj = {customer: item.customer._id};
 
@@ -162,20 +165,20 @@ let self = ({
                         Order.countDocuments(sObj, function (err, theOrderCount) {
                             orders[i].customer.orderCount = (theOrderCount - 0);
                             if (req.query.orderCount) {
-                                console.log('req.query.orderCount', req.query.orderCount)
+                                // console.log('req.query.orderCount', req.query.orderCount)
                                 if (orders[i].customer.orderCount > req.query.orderCount) {
-                                    console.log('f1 push ', i)
+                                    // console.log('f1 push ', i)
 
                                 }
                             } else {
-                                console.log('f2 push ', i)
+                                // console.log('f2 push ', i)
 
                             }
                             f[i] = (orders[i]);
 
                             p++;
                             if (p == thelength) {
-                                console.log('here...', p, thelength)
+                                // console.log('here...', p, thelength)
                                 return res.json(f);
                                 // 0;
                             }
@@ -187,7 +190,7 @@ let self = ({
                         p++;
                     }
                     if (p == thelength) {
-                        console.log('here2...')
+                        // console.log('here2...')
 
                         return res.json(f);
                         // 0;
@@ -208,7 +211,7 @@ let self = ({
     },
 
     createByCustomer: function (req, res, next) {
-        console.log('createByCustomer... , ', req.headers);
+        // console.log('createByCustomer... , ', req.headers);
         let Product = req.mongoose.model('Product');
         let Order = req.mongoose.model('Order');
         let Settings = req.mongoose.model('Settings');
@@ -243,12 +246,12 @@ let self = ({
                 id = pack._id;
             }
 
-            console.log('_id', id, pack.price, pack.salePrice);
+            // console.log('_id', id, pack.price, pack.salePrice);
             // _ids.push(id);
             // console.log('find _id:', id);
             let tempProducts = [];
             Product.findOne({_id: id}, '_id combinations type price salePrice title quantity in_stock', function (err, ps) {
-                console.log('found id:', id, 'main_id[1]:', main_id[1], 'ps', ps);
+                // console.log('found id:', id, 'main_id[1]:', main_id[1], 'ps', ps);
                 if (!ps) {
                     return res.json({
                         success: false,
@@ -260,7 +263,7 @@ let self = ({
                     if (ps.combinations) {
                         _.forEach(ps.combinations, function (comb, inde) {
                             if ((inde == main_id[1]) || (comb.id == main_id[1])) {
-                                console.log('find comb', comb);
+                                // console.log('find comb', comb);
                                 if (pack.salePrice) {
                                     if (pack.salePrice != comb.salePrice) {
                                         return res.json({
@@ -370,8 +373,8 @@ let self = ({
                 // }
 
 
-                console.log('ii', ii);
-                console.log('len', len);
+                // console.log('ii', ii);
+                // console.log('len', len);
 
                 tempProducts.push(ps);
                 req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
@@ -379,9 +382,9 @@ let self = ({
                 req.body.customer = req.headers._id;
 
                 if (ii == len) {
-                    console.log('\ntempProducts: ', tempProducts)
+                    // console.log('\ntempProducts: ', tempProducts)
                     req.global.checkSiteStatus().then(function (resp) {
-                        console.log('resp', resp);
+                        // console.log('resp', resp);
                         Settings.findOne({}, 'tax taxAmount', function (err, setting) {
                             let tax = setting.tax || false;
                             let taxAmount = setting.taxAmount || 0;
@@ -401,7 +404,7 @@ let self = ({
                                 // req.body.taxAmount = taxAmount;
                                 // req.body.amount=taxAmount+req.body.amount;
                             }
-                            console.log('req.body.customer', req.body.customer)
+                            // console.log('req.body.customer', req.body.customer)
                             let lastObject = {
                                 "billingAddress": req.body.billingAddress,
                                 "amount": req.body.amount,
@@ -454,7 +457,7 @@ let self = ({
                                             // || discount.customerLimit !== 0
                                             if (isInArray) {
 
-                                                console.log('found it', req.headers._id)
+                                                // console.log('found it', req.headers._id)
                                                 // if (!discount.customerLimit || discount.customerLimit !== 0)
                                                 if (discount.customerLimit)
                                                     return res.json({
@@ -474,7 +477,7 @@ let self = ({
                                         function continueDiscount() {
 
                                             discount.customer.push(req.headers._id);
-                                            console.log('req.body.amount', req.body.amount)
+                                            // console.log('req.body.amount', req.body.amount)
                                             let theDiscount = 0;
                                             // return res.json(order);
                                             if (discount.price) {
@@ -505,10 +508,10 @@ let self = ({
                                                         });
                                                     }
                                                     lastObject['discountAmount'] = theDiscount;
-                                                    console.log('req.body.amount', req.body.amount)
-                                                    console.log('theDiscount', theDiscount)
+                                                    // console.log('req.body.amount', req.body.amount)
+                                                    // console.log('theDiscount', theDiscount)
                                                     req.body.amount = req.body.amount - theDiscount;
-                                                    console.log('req.body.amount', req.body.amount)
+                                                    // console.log('req.body.amount', req.body.amount)
                                                     lastObject['amount'] = req.body.amount
                                                     update_order();
                                                 });
@@ -521,9 +524,9 @@ let self = ({
                             }
 
                             function update_order() {
-                                console.log('==> update_order')
+                                // console.log('==> update_order')
                                 if (req.body.order_id) {
-                                    console.log('==> create order 1...', req.body.order_id);
+                                    // console.log('==> create order 1...', req.body.order_id);
 
                                     Order.findOneAndUpdate(
                                         {order_id: req.body.order_id}, {
@@ -533,7 +536,7 @@ let self = ({
                                             },
                                         }, function (err, order) {
                                             if (err || !order) {
-                                                console.log('err', err);
+                                                // console.log('err', err);
                                                 Order.create({
                                                     ...lastObject,
                                                     order_id: req.body.order_id,
@@ -558,7 +561,7 @@ let self = ({
                                                         };
                                                         // req.global.submitAction(action);
                                                     }
-                                                    console.log('creating order successfully:', order);
+                                                    // console.log('creating order successfully:', order);
                                                     change_products_quantities();
                                                     req.fireEvent('create-order-by-customer', order);
                                                     res.json({success: true, order: order});
@@ -587,7 +590,7 @@ let self = ({
                                                 //     };
                                                 //     req.global.submitAction(action);
                                                 // }
-                                                console.log('creating order successfully:', order);
+                                                // console.log('creating order successfully:', order);
                                                 change_products_quantities();
                                                 req.fireEvent('create-order-by-customer', order);
 
@@ -596,7 +599,7 @@ let self = ({
 
                                         });
                                 } else {
-                                    console.log('create order 2... line 240');
+                                    // console.log('create order 2... line 240');
                                     Order.create({
                                         billingAddress: req.body.billingAddress,
                                         amount: req.body.amount,
@@ -630,7 +633,7 @@ let self = ({
                                             };
                                             // req.global.submitAction(action);
                                         }
-                                        console.log('creating order successfully:', order);
+                                        // console.log('creating order successfully:', order);
                                         change_products_quantities();
                                         req.fireEvent('create-order-by-customer', order);
                                         res.json({success: true, order: order});
@@ -643,7 +646,7 @@ let self = ({
                             function change_products_quantities() {
 
 
-                                console.log('****** change_products_quantities(())=> ')
+                                console.log('****** change_products_quantities ******')
                                 // _.forEach(tempProducts, function (tempProduct) {
                                 //     console.log('\ntempProduct',{
                                 //         in_stock:tempProduct.in_stock,
@@ -712,17 +715,17 @@ let self = ({
                 id = pack._id;
             }
 
-            console.log('_id', id, pack.price, pack.salePrice);
+            // console.log('_id', id, pack.price, pack.salePrice);
             // _ids.push(id);
             // console.log('find _id:', id);
             Product.findOne({_id: id}, '_id combinations type price salePrice title', function (err, ps) {
-                console.log('found id:', id, 'main_id[1]:', main_id[1], 'ps', ps);
+                // console.log('found id:', id, 'main_id[1]:', main_id[1], 'ps', ps);
                 ii++;
                 if (ps.type != 'normal') {
                     if (ps.combinations) {
                         _.forEach(ps.combinations, function (comb, inde) {
                             if ((inde == main_id[1]) || (comb.id == main_id[1])) {
-                                console.log('find comb', comb);
+                                // console.log('find comb', comb);
                                 if (pack.salePrice) {
                                     if (pack.salePrice != comb.salePrice) {
                                         return res.json({
@@ -828,17 +831,17 @@ let self = ({
                     }
                 }
 
-                console.log('ii', ii);
-                console.log('len', len);
+                // console.log('ii', ii);
+                // console.log('len', len);
                 req.body.orderNumber = Math.floor(10000 + Math.random() * 90000);
                 // return;
                 if (ii == len)
                     req.global.checkSiteStatus().then(function (resp) {
-                        console.log('resp', resp);
+                        // console.log('resp', resp);
 
                         req.body.customer = req.headers.customer_id;
                         if (req.body.order_id) {
-                            console.log('create order 1 line 847 ...', req.body.order_id);
+                            // console.log('create order 1 line 847 ...', req.body.order_id);
 
                             Order.findOneAndUpdate({_id: req.body.order_id}, {
                                 $set: {
@@ -888,13 +891,13 @@ let self = ({
                                     });
 
                                 } else {
-                                    console.log('creating order successfully:', order);
+                                    // console.log('creating order successfully:', order);
                                     return res.json({success: true, order: order});
                                 }
 
                             });
                         } else {
-                            console.log('create order 2... line 524');
+                            // console.log('create order 2... line 524');
                             Order.create({
                                 billingAddress: req.body.billingAddress,
                                 amount: req.body.amount,
@@ -917,7 +920,7 @@ let self = ({
                                     });
                                     return 0;
                                 }
-                                console.log('creating order successfully:', order);
+                                // console.log('creating order successfully:', order);
                                 res.json({success: true, order: order});
                                 return 0;
 
@@ -1023,7 +1026,7 @@ let self = ({
         let search = {};
         search['customer'] = req.headers._id;
         // search['status']='published';
-        console.log('search', search)
+        // console.log('search', search)
         Order.find(search, '_id updatedAt createdAt card sum amount deliveryPrice orderNumber status paymentStatus deliveryDay customer_data billingAddress transaction', function (err, orders) {
             if (err || !orders) {
                 res.json([]);
@@ -1060,7 +1063,7 @@ let self = ({
             _id: req.params.id,
             customer: req.headers._id.toString(),
         }
-        console.log('obj', obj)
+        // console.log('obj', obj)
         Order.findOne(obj,
             function (err, order) {
                 if (err || !order) {
@@ -1086,7 +1089,7 @@ let self = ({
         let Gateway = req.mongoose.model('Gateway');
         let Settings = req.mongoose.model('Settings');
 
-        console.log("buy...", req.params._id, req.body.amount);
+        // console.log("buy...", req.params._id, req.body.amount);
         if (req.body.amount && (req.body.amount == null || req.body.amount == "null"))
             return res.json({
                 success: false,
@@ -1145,7 +1148,7 @@ let self = ({
                         //check if we have method or not,
                         // for both we have to create transaction
                         //    if we have method, submit method too
-                        console.log('order.orderNumber', order.orderNumber)
+                        // console.log('order.orderNumber', order.orderNumber)
                         gateway.request = gateway.request.replaceAll("%domain%", process.env.BASE_URL);
 
 
@@ -1155,7 +1158,7 @@ let self = ({
                         gateway.request = gateway.request.split("%orderNumber%").join(order.orderNumber);
                         // gateway.request = gateway.request.replace("%orderNumber%", order.orderNumber);
                         gateway.request = gateway.request.replaceAll("%orderId%", order._id);
-                        console.log('gateway.request', gateway.request);
+                        // console.log('gateway.request', gateway.request);
                         if (!JSON.parse(gateway.request))
                             return res.json({
                                 success: false,
@@ -1164,7 +1167,7 @@ let self = ({
                             })
                         // let sendrequest=
                         var theReq = JSON.parse(gateway.request);
-                        console.log('theReq[\'amount\']', theReq['data'])
+                        // console.log('theReq[\'amount\']', theReq['data'])
 
                         if (theReq['data'] && theReq['data']['Amount'])
                             theReq['data']['Amount'] = stringMath(theReq['data']['Amount'].toString())
@@ -1177,7 +1180,7 @@ let self = ({
 
                         if (theReq['body'] && theReq['body']['amount'])
                             theReq['body']['amount'] = stringMath(theReq['body']['amount'].toString())
-                        console.log('gateway.request', theReq)
+                        // console.log('gateway.request', theReq)
 
                         // return;
                         req.httpRequest(theReq).then(function (parsedBody) {
@@ -1342,7 +1345,7 @@ let self = ({
             if (req.body.orderNumber) {
                 obj['orderNumber'] = req.body.orderNumber;
             }
-            console.log('obj', obj)
+            // console.log('obj', obj)
             if (!obj.order_id) {
                 obj.order_id = crypto.randomBytes(64).toString('hex');
             }
@@ -1384,10 +1387,10 @@ let self = ({
     },
     sendReq: function (req, theUrl, page) {
         page = parseInt(page)
-        console.log('get:', theUrl, 'page:', page)
+        // console.log('get:', theUrl, 'page:', page)
         let url = theUrl;
         url += '&page=' + page;
-        console.log('theUrl:', url);
+        // console.log('theUrl:', url);
         req.httpRequest({
             method: "get",
             url: url,
@@ -1421,7 +1424,7 @@ let self = ({
                     // console.log('date_created', dat.date_created, new Date(dat.date_created))
                     obj['updatedAt'] = moment(dat.date_modified).format();
                 }
-                console.log('created dat id:', dat.id)
+                // console.log('created dat id:', dat.id)
                 Order.create(obj, function (err, ord) {
                     let y = page + 1;
                     self.checkOrder(req, ord)
@@ -1431,7 +1434,7 @@ let self = ({
             });
             // return res.json(response.data)
         }).catch(e => {
-            console.log('#page =====>     error')
+            // console.log('#page =====>     error')
 
             let y = page;
 
@@ -1456,7 +1459,7 @@ let self = ({
         // if (req.query.page) {
         //     url += '&page=' + req.query.page;
         // }
-        console.log('importFromWordpress', url);
+        // console.log('importFromWordpress', url);
         let count = 0;
         var i = req.query.page;
         // for (var i = 3101; i < 7000; i++) {
@@ -1635,7 +1638,7 @@ let self = ({
                 custObj['sex'] = sex
             }
             if (birthday && monthday) {
-                console.log(monthday + '/' + birthday)
+                // console.log(monthday + '/' + birthday)
                 // custObj['birthdate']=sex
             }
             let phoneNumber = (item.data.billing.phone).slice(-12);
@@ -1671,7 +1674,7 @@ let self = ({
                 Customer.findOneAndUpdate({phoneNumber: phoneNumber}, custObj, {new: true}, function (err, customer) {
                     if (!customer) {
                         Notfound++;
-                        console.log('#' + k + ' customer not found', item.data.billing.phone, phoneNumber);
+                        // console.log('#' + k + ' customer not found', item.data.billing.phone, phoneNumber);
                         custObj['firstName'] = item.data.billing.first_name;
                         custObj['lastName'] = item.data.billing.last_name;
                         Customer.create({phoneNumber: phoneNumber, ...custObj}, function (err, tcustomer) {
@@ -1689,7 +1692,7 @@ let self = ({
                                     "PostalCode": item.data.billing.postcode
                                 }
                                 Order.findByIdAndUpdate(item._id, obj, function (err, products) {
-                                    console.log('k', k, moment(item.data.date_created).format(), products.createdAt)
+                                    // console.log('k', k, moment(item.data.date_created).format(), products.createdAt)
                                 })
                             }
                         });
@@ -1737,20 +1740,20 @@ let self = ({
                             if (err) {
                                 console.log('err', err)
                             }
-                            if (obj.card)
-                                console.log('k', k, obj.card.length, orders.card.length, orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
+                            // if (obj.card)
+                                // console.log('k', k, obj.card.length, orders.card.length, orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
                         })
                     }
                 })
         } else {
-            console.log('obj', obj)
+            // console.log('obj', obj)
             // return
             Order.findByIdAndUpdate(item._id, obj, {new: true}, function (err, orders) {
                 if (err) {
-                    console.log('err', err)
+                    console.error('err', err)
                 }
-                if (item.data)
-                    console.log('k', k, obj.card.length, orders.card.length, orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
+                // if (item.data)
+                    // console.log('k', k, obj.card.length, orders.card.length, orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
             })
         }
     },
@@ -1796,7 +1799,6 @@ let self = ({
                     success: true,
                     message: 'Deleted!'
                 });
-
 
             }
         );
