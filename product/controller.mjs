@@ -615,7 +615,7 @@ let self = ({
                     if (c.thirdCategory && c.thirdCategory.slug)
                         cat_inLink = c.thirdCategory.slug;
                     // console.log('tax', setting)
-                    if (setting.tax && setting.taxAmount) {
+                    if (setting && (setting.tax && setting.taxAmount)) {
                         if (last_price) {
                             let n = (parseInt(setting.taxAmount) * last_price) / 100
                             last_price = last_price + parseInt(n);

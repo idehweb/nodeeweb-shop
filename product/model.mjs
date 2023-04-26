@@ -32,6 +32,8 @@ export default (mongoose)=>{
         customer: { type: mongoose.Schema.Types.ObjectId, ref: "Customer" },
         type: { type: String, default: "normal" },
         description: {},
+        requireWarranty:{},
+
         views: [],
         addToCard: [],
         title: {},
