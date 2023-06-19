@@ -1063,7 +1063,7 @@ let self = ({
             _id: req.params.id,
             customer: req.headers._id.toString(),
         }
-        // console.log('obj', obj)
+        console.log('obj', obj)
         Order.findOne(obj,
             function (err, order) {
                 if (err || !order) {
@@ -1741,7 +1741,7 @@ let self = ({
                                 console.log('err', err)
                             }
                             // if (obj.card)
-                                // console.log('k', k, obj.card.length, orders.card.length, orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
+                            // console.log('k', k, obj.card.length, orders.card.length, orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
                         })
                     }
                 })
@@ -1753,7 +1753,7 @@ let self = ({
                     console.error('err', err)
                 }
                 // if (item.data)
-                    // console.log('k', k, obj.card.length, orders.card.length, orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
+                // console.log('k', k, obj.card.length, orders.card.length, orders.orderNumber, moment(item.data.date_created).format(), orders.createdAt)
             })
         }
     },

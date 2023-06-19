@@ -59,6 +59,71 @@ var self = ({
 
         }).limit(parseInt(req.params.limit));
     },
+    allWTransactions: function (req, res, next) {
+        let Transaction = req.mongoose.model('Transaction');
+
+        // console.log('allWOrders');
+        let offset = 0;
+        if (req.params.offset) {
+            offset = parseInt(req.params.offset);
+        }
+
+        let search = {};
+        search['customer'] = req.headers._id;
+        // search['status']='published';
+        console.log('get trabnsactions search', search)
+        Transaction.find(search,  function (err, transactions) {
+            if (err || !transactions) {
+                res.json([]);
+                return 0;
+            }
+
+            Transaction.countDocuments(search, function (err, count) {
+                // console.log('countDocuments', count);
+                if (err || !count) {
+                    res.json([]);
+                    return 0;
+                }
+                res.setHeader(
+                    'X-Total-Count',
+                    count,
+                );
+
+
+                // transactions.map(resource => ({ ...resource, id: resource._id }))
+                res.json(transactions);
+                return 0;
+
+
+            });
+
+        }).populate('customer', 'nickname photos').populate('order', 'orderNumber _id amount').skip(offset).sort({_id: -1}).limit(parseInt(req.params.limit)).lean();
+    },
+
+    myTransaction: function (req, res, next) {
+        let Transaction = req.mongoose.model('Transaction');
+
+        // console.log('hgfgh');
+        let obj = {
+            _id: req.params.id,
+            customer: req.headers._id.toString(),
+        }
+        // console.log('obj', obj)
+        Transaction.findOne(obj,
+            function (err, order) {
+                if (err || !order) {
+                    res.json({
+                        success: false,
+                        message: 'error!',
+                    });
+                    return 0;
+                }
+
+                return res.json(order);
+
+            }).populate('customer', 'nickname phoneNumber firstName lastName').populate('transaction', 'Authority amount statusCode status');
+    },
+
     buy: function (req, res, next) {
         let LIMIT=1000000000
 
@@ -67,6 +132,7 @@ var self = ({
         let Transaction = req.mongoose.model('Transaction');
         let Gateway = req.mongoose.model('Gateway');
         let Settings = req.mongoose.model('Settings');
+        let Customer = req.mongoose.model('Customer');
 
         console.log("buy...", req.params._id, req.params._price);
         if (req.params._price && (req.params._price == null || req.params._price == "null"))
@@ -195,47 +261,76 @@ var self = ({
                                 // console.log('notif',notif);
                                 // req.publishToTelegram(notif)
                                 // return;
+                                if(req.headers.token){
+                                    console.log('token found',req.headers.token);
 
-                                Transaction.create(obj, function (err, transaction) {
-                                    if (err || !transaction) {
-                                        return res.json({
-                                            success: false,
-                                            message: "transaction could not be created",
-                                            err: err
-                                        })
-                                    }
-                                    req.fireEvent('create-transaction-by-customer', transaction);
-
-                                    Order.findByIdAndUpdate(req.params._id, {
-                                        $push: {
-                                            transaction: transaction._id
+                                    Customer.findOne({
+                                        "tokens.token":req.headers.token
+                                    },'_id',function(err,customer){
+                                        console.log('customer',customer)
+                                        console.log('err',err)
+                                        if(err){
+                                            console.log('customer is not logged in')
+                                            createTransaction()
                                         }
-                                    }, function (order_err, updated_order) {
-                                        console.log('end of buy...');
-                                        if (parsedBody['data'] && parsedBody['data']['url']) {
-                                            return res.json({
-                                                success: true,
-                                                url: parsedBody['data']['url']
-                                            });
-                                        }
-                                        if (parsedBody['data'] && parsedBody['data'].trackId) {
 
-                                            return res.json({
-                                                success: true,
-                                                // data: parsedBody['data'],
-                                                // request: JSON.parse(gateway.request),
-                                                url: "https://gateway.zibal.ir/start/" + parsedBody['data'].trackId
-                                            });
-                                        } else {
+                                        if(customer && customer._id){
+                                            console.log('customer is logged in')
+
+                                            console.log('customer._id',customer._id)
+                                            obj['customer']=customer._id
+                                            createTransaction()
+                                        }
+                                    })
+                                }else{
+                                    console.log('token not found');
+
+                                    createTransaction()
+
+                                }
+                                function createTransaction(){
+                                    Transaction.create(obj, function (err, transaction) {
+                                        if (err || !transaction) {
                                             return res.json({
                                                 success: false,
-                                                // data: parsedBody['data'],
-                                                // request: JSON.parse(gateway.request),
-                                                parsedBody: parsedBody['data']
-                                            });
+                                                message: "transaction could not be created",
+                                                err: err
+                                            })
                                         }
+                                        req.fireEvent('create-transaction-by-customer', transaction);
+
+                                        Order.findByIdAndUpdate(req.params._id, {
+                                            $push: {
+                                                transaction: transaction._id
+                                            }
+                                        }, function (order_err, updated_order) {
+                                            console.log('end of buy...');
+                                            if (parsedBody['data'] && parsedBody['data']['url']) {
+                                                return res.json({
+                                                    success: true,
+                                                    url: parsedBody['data']['url']
+                                                });
+                                            }
+                                            if (parsedBody['data'] && parsedBody['data'].trackId) {
+
+                                                return res.json({
+                                                    success: true,
+                                                    // data: parsedBody['data'],
+                                                    // request: JSON.parse(gateway.request),
+                                                    url: "https://gateway.zibal.ir/start/" + parsedBody['data'].trackId
+                                                });
+                                            } else {
+                                                return res.json({
+                                                    success: false,
+                                                    // data: parsedBody['data'],
+                                                    // request: JSON.parse(gateway.request),
+                                                    parsedBody: parsedBody['data']
+                                                });
+                                            }
+                                        });
                                     });
-                                });
+
+                                }
 
                             }).catch(e => {
                                 // req.publishToTelegram('error creating transaction! please check...' + "\nfor order:" + order.orderNumber + "\namount:" + order.amount)

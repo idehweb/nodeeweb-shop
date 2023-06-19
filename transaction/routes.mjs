@@ -59,6 +59,12 @@ export default [
         "controller": controller.buy,
     },
     {
+        "path": "/myTransactions/mine/:offset/:limit",
+        "method": "get",
+        "access": "admin_user,admin_shopManager,customer_user",
+        "controller": controller.allWTransactions,
+    },
+    {
         "path": "/:offset/:limit",
         "method": "get",
         "access": "admin_user,admin_shopManager",
